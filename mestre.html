@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRACTURE — Painel do Mestre</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg: #070b14;
+    --bg-vignette: radial-gradient(ellipse at top, #101a2e 0%, #070b14 58%);
+    --surface: #0d1424;
+    --surface-2: #131c30;
+    --line: #223250;
+    --accent: #4da3ff;
+    --accent-dim: #4da3ff2b;
+    --accent-glow: #4da3ff66;
+    --ice: #7fe3ff;
+    --ice-dim: #7fe3ff2b;
+    --hp: #ff6b7a;
+    --hp-glow: #ff6b7a55;
+    --violet: #9b8cff;
+    --violet-dim: #9b8cff2b;
+    --text: #e8eefc;
+    --text-dim: #8c9ab8;
+    --text-faint: #56627c;
+}
+
+*{ box-sizing: border-box; }
+[hidden]{ display: none !important; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-vignette);
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 28px 16px 80px;
+    margin: 0 auto;
+    max-width: 1000px;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.masthead{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 6px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+}
+h1{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-transform: uppercase;
+}
+h1 span{ color: var(--accent); }
+
+.status-salvo{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+.status-salvo .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.status-salvo.ativo{ color: var(--ice); }
+.status-salvo.ativo .dot{ background: var(--ice); box-shadow: 0 0 8px var(--ice); }
+
+.fracture-line{
+    height: 10px;
+    margin: 22px 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath d='M0 5 L8 2 L14 8 L20 1 L26 7 L32 3 L40 5' stroke='%23223250' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: center;
+}
+
+/* ---------- Painéis / formulário ---------- */
+
+.box{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+.box h2{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.box h2::before{ content: ""; width: 3px; height: 14px; background: var(--accent); display: inline-block; }
+.box h3{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 16px 0 6px 0;
+}
+.box h3:first-of-type{ margin-top: 4px; }
+
+input, textarea, select{
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input::placeholder, textarea::placeholder{ color: var(--text-faint); }
+input:focus, textarea:focus, select:focus{
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+}
+textarea{ resize: vertical; line-height: 1.5; font-size: 13px; }
+input[type=number]{ font-family: 'JetBrains Mono', monospace; }
+
+button{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 9px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+button:hover{ background: var(--accent); color: #07101e; }
+button.neutro{ border-color: var(--line); color: var(--text-dim); }
+button.neutro:hover{ background: var(--surface-2); color: var(--text); }
+button.confirmando{ background: var(--accent); color: #07101e; }
+
+.btn-mini{ padding: 3px 8px; font-size: 10px; min-width: 30px; }
+
+.botoes{ display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.novo-grupo{ display: flex; gap: 8px; align-items: center; }
+.novo-grupo input{ width: 170px; }
+.nota{ font-size: 12px; color: var(--text-dim); margin: 12px 0 0; line-height: 1.5; min-height: 18px; }
+.small{ font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
+.vazio-geral{ color: var(--text-dim); font-size: 14px; line-height: 1.6; margin: 0; }
+
+/* ---------- Grupos ---------- */
+
+.grupo{
+    margin-bottom: 18px;
+    padding: 8px;
+    border: 1px dashed transparent;
+    border-radius: 6px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.grupo.alvo{ border-color: var(--accent); background: var(--accent-dim); }
+
+.grupo-topo{ display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.chev{ padding: 2px 8px; font-size: 12px; border-color: var(--line); color: var(--text-dim); }
+.grupo-nome{
+    flex: 1;
+    max-width: 320px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--line);
+    border-radius: 0;
+    padding: 4px 2px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+.grupo-nome:focus{ box-shadow: none; border-bottom-color: var(--accent); }
+.grupo-nome-fixo{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.contagem{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1px 8px;
+}
+.grupo-vazio{ font-size: 12px; color: var(--text-faint); padding: 10px 4px; }
+
+.painel-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+}
+
+/* ---------- Cards da lista ---------- */
+
+.card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ice);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.card.inimigo{ border-left-color: var(--violet); }
+.card.caido{ opacity: 0.6; }
+.card.arrastando{ opacity: 0.35; }
+
+.card-topo{ display: flex; align-items: center; gap: 10px; }
+.alca{ cursor: grab; color: var(--text-faint); font-size: 18px; line-height: 1; user-select: none; padding: 2px; }
+.alca:hover{ color: var(--accent); }
+
+.mini-foto{
+    width: 44px; height: 44px;
+    border-radius: 4px;
+    object-fit: cover;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    color: var(--text-faint);
+}
+.card-titulo{ display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.card-titulo strong{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+button.badge{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 7px;
+    border: none;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+button.badge.jogador{ background: var(--ice-dim); color: var(--ice); }
+button.badge.inimigo{ background: var(--violet-dim); color: var(--violet); }
+button.badge:hover{ filter: brightness(1.3); }
+button.badge.jogador:hover{ background: var(--ice-dim); color: var(--ice); }
+button.badge.inimigo:hover{ background: var(--violet-dim); color: var(--violet); }
+
+.recurso-linha{ display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
+.rotulo{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    width: 52px;
+}
+.num{ width: 58px; text-align: center; padding: 4px 6px; }
+.max{ font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
+.ajustes{ display: flex; gap: 4px; margin-left: auto; }
+
+.bar{
+    background: var(--surface-2);
+    height: 10px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+}
+.fill{
+    height: 100%;
+    background: linear-gradient(90deg, var(--hp), #ff9aa5);
+    transition: width 0.25s ease;
+    box-shadow: 0 0 8px var(--hp-glow);
+}
+.fill.energia{ background: linear-gradient(90deg, var(--accent), var(--ice)); box-shadow: 0 0 8px var(--accent-glow); }
+
+.card-acoes{ display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.card-acoes select{ padding: 4px 6px; font-size: 11px; max-width: 130px; }
+.card-acoes .espaco{ flex: 1; }
+
+/* ---------- Janela da ficha completa ---------- */
+
+.modal-ficha{
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 5, 12, 0.88);
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+}
+.ficha-janela{
+    background: var(--bg);
+    background-image: var(--bg-vignette);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: min(860px, 100%);
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.ficha-topo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+}
+.ficha-topo strong{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.ficha-corpo{ overflow-y: auto; padding: 18px 18px 8px; }
+.ficha-nota{ padding: 8px 18px; font-size: 12px; color: var(--ice); background: var(--ice-dim); border-bottom: 1px solid var(--line); }
+
+/* campos dentro da ficha */
+
+.row{ display: flex; gap: 12px; flex-wrap: wrap; }
+.field{ display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; }
+.field label{
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+}
+.field input, .field select{ width: 100%; }
+.ficha-corpo textarea{ width: 100%; }
+
+.info-layout{ display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.info-campos{ flex: 1 1 280px; }
+.foto-wrap{ display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.foto{
+    width: 132px;
+    height: 132px;
+    border: 1px dashed var(--text-faint);
+    background: var(--surface-2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    color: var(--text-faint);
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.foto:hover, .foto:focus{ border-color: var(--accent); color: var(--accent); outline: none; }
+.foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.pontos-restantes{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border-left: 2px solid var(--line);
+}
+.pontos-restantes b{ color: var(--ice); font-size: 14px; }
+.pontos-restantes.aviso{ border-left-color: var(--hp); }
+.pontos-restantes.aviso b{ color: var(--hp); }
+.pontos-restantes .aviso-texto{ display: none; color: var(--hp); margin-left: 6px; }
+.pontos-restantes.aviso .aviso-texto{ display: inline; }
+
+.status-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+@media (max-width: 480px){ .status-grid{ grid-template-columns: 1fr; } }
+.status-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+}
+.status-row span{
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.status-row input{ border: none; background: transparent; padding: 0; width: 44px; text-align: center; }
+.status-row input:focus{ box-shadow: none; color: var(--ice); }
+
+/* perícias */
+
+.pericias-tabela{ display: flex; flex-direction: column; gap: 2px; }
+.linha{
+    display: grid;
+    grid-template-columns: 1fr 0.35fr 0.35fr 0.35fr;
+    align-items: center;
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 4px;
+}
+.linha:not(.header):hover{ background: var(--surface-2); }
+.linha div:first-child{ text-align: left; font-size: 13px; }
+.linha div:first-child .small{ margin-left: 4px; }
+.linha input[type=radio]{ width: 15px; height: 15px; accent-color: var(--accent); margin: 0 auto; padding: 0; cursor: pointer; }
+.linha input[type=radio]:disabled{ opacity: 0.25; cursor: not-allowed; }
+.linha.header{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+/* equipamentos e listas */
+
+.item-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 4px; }
+@media (max-width: 520px){ .item-grid{ grid-template-columns: 1fr; } }
+.item-card{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.item-card input, .item-card textarea{ width: 100%; background: var(--surface); }
+.item-card input{ font-weight: 600; }
+.item-card textarea{ min-height: 50px; }
+
+.lista-dinamica{ display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.lista-dinamica:empty{ margin-bottom: 0; }
+.card-dinamico{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.card-dinamico input, .card-dinamico textarea, .card-dinamico select{ width: 100%; background: var(--surface); }
+.card-dinamico .linha-topo{ display: flex; gap: 8px; align-items: flex-start; }
+.card-dinamico .linha-topo input{ flex: 1; width: auto; font-weight: 600; }
+
+.botao-remover{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text-faint);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    line-height: 1;
+    font-size: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.botao-remover:hover{ background: var(--accent); border-color: var(--accent); color: #07101e; }
+.botao-add{ border-style: dashed; margin-bottom: 10px; }
+
+.campos-habilidade{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 520px){ .campos-habilidade{ grid-template-columns: 1fr; } }
+.energia-campo input{ max-width: 120px; }
+
+.botao-ngc{
+    align-self: flex-start;
+    border-color: var(--violet);
+    color: var(--violet);
+    font-size: 11px;
+    padding: 6px 12px;
+}
+.botao-ngc:hover{ background: var(--violet); color: #07101e; }
+.ngc-secao{ border-left: 2px solid var(--violet); padding-left: 10px; display: flex; flex-direction: column; gap: 6px; }
+.ngc-titulo{
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--violet);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* rolagem */
+
+.historico-item .linha-topo{ justify-content: space-between; align-items: center; }
+.historico-item strong{ font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.03em; }
+.grau-badge{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+.grau-sucesso{ background: var(--ice-dim); color: var(--ice); }
+.grau-falha{ background: #ff6b7a2b; color: var(--hp); }
+
+/* ---------- Recorte da foto ---------- */
+
+.modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 5, 12, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 100;
+}
+.modal-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    max-width: 100%;
+}
+.modal-card h2{
+    margin: 0;
+    align-self: flex-start;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.crop-area{
+    width: 280px;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--accent);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+.crop-area:active{ cursor: grabbing; }
+.crop-area img{ position: absolute; max-width: none; pointer-events: none; -webkit-user-drag: none; }
+.crop-zoom{ width: 280px; max-width: 100%; }
+.crop-zoom input{ padding: 0; width: 100%; accent-color: var(--accent); }
+.crop-dica{ font-size: 11px; color: var(--text-faint); margin: 0; text-align: center; }
+
+/* ---------- Intro ---------- */
+
+#intro{ position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+#intro.saindo{ pointer-events: none; }
+.intro-metade{
+    position: absolute; inset: 0;
+    background-color: var(--bg);
+    background-image: var(--bg-vignette);
+    transition: transform 0.95s cubic-bezier(0.76, 0, 0.2, 1);
+    will-change: transform;
+}
+.intro-esq{ clip-path: polygon(0 0, 52% 0, 47% 18%, 54% 35%, 46% 52%, 53% 70%, 48% 86%, 51% 100%, 0 100%); }
+.intro-dir{ clip-path: polygon(52% 0, 100% 0, 100% 100%, 51% 100%, 48% 86%, 53% 70%, 46% 52%, 54% 35%, 47% 18%); }
+#intro.saindo .intro-esq{ transform: translateX(-102%); }
+#intro.saindo .intro-dir{ transform: translateX(102%); }
+
+.intro-rachadura-wrap{
+    position: absolute; inset: 0; pointer-events: none;
+    filter: drop-shadow(0 0 6px var(--accent-glow)) drop-shadow(0 0 20px var(--accent-glow));
+    transition: opacity 0.3s ease;
+}
+.intro-rachadura{ width: 100%; height: 100%; display: block; animation: introRachar 1.05s cubic-bezier(0.5, 0, 0.3, 1) 0.1s both; }
+.intro-rachadura polyline{ fill: none; stroke: var(--accent); stroke-width: 2.4; vector-effect: non-scaling-stroke; stroke-linejoin: miter; }
+@keyframes introRachar{ from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+.intro-flash{
+    position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at 50% 50%, var(--accent-glow), transparent 55%);
+    animation: introFlash 0.55s ease-out 0.8s both;
+}
+@keyframes introFlash{ 0% { opacity: 0; } 25% { opacity: 0.9; } 100% { opacity: 0; } }
+
+.intro-titulo{
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px;
+    pointer-events: none; text-align: center; padding: 0 16px;
+    transition: opacity 0.3s ease;
+}
+.intro-nome{
+    font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase;
+    font-size: clamp(40px, 11vw, 104px); color: var(--accent);
+    animation: introTitulo 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) 0.55s both, introGlitch 0.4s steps(2, end) 1.45s both;
+}
+@keyframes introTitulo{
+    from { opacity: 0; letter-spacing: 0.7em; filter: blur(10px); }
+    to { opacity: 1; letter-spacing: 0.16em; filter: blur(0); }
+}
+@keyframes introGlitch{
+    0%, 100% { text-shadow: none; transform: none; }
+    25% { text-shadow: -4px 0 var(--ice), 4px 0 var(--accent); transform: translateX(3px); }
+    50% { text-shadow: 4px 0 var(--ice), -4px 0 var(--accent); transform: translateX(-3px); }
+    75% { text-shadow: -2px 0 var(--ice), 2px 0 var(--accent); transform: translateX(1px); }
+}
+.intro-sub{
+    font-family: 'JetBrains Mono', monospace; font-size: clamp(10px, 2.4vw, 14px);
+    letter-spacing: 0.5em; color: var(--text-dim);
+    animation: introSub 0.7s ease-out 1.0s both;
+}
+@keyframes introSub{ from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.intro-pular{
+    position: absolute; bottom: 22px; left: 0; right: 0; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint); animation: introSub 0.6s ease-out 1.2s both;
+}
+#intro.saindo .intro-titulo, #intro.saindo .intro-rachadura-wrap{ opacity: 0; }
+#intro.saindo .intro-flash, #intro.saindo .intro-pular{ display: none; }
+</style>
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+<div class="intro-metade intro-esq"></div>
+<div class="intro-metade intro-dir"></div>
+<div class="intro-rachadura-wrap">
+<svg class="intro-rachadura" viewBox="0 0 100 100" preserveAspectRatio="none">
+<polyline points="52,0 47,18 54,35 46,52 53,70 48,86 51,100"/>
+<polyline points="47,18 38,24 33,33 26,36"/>
+<polyline points="54,35 63,41 68,52 76,55"/>
+<polyline points="46,52 37,60 35,71"/>
+<polyline points="53,70 62,76 66,86"/>
+</svg>
+</div>
+<div class="intro-flash"></div>
+<div class="intro-titulo"><span class="intro-nome">FRACTURE</span><span class="intro-sub">PAINEL DO MESTRE</span></div>
+<div class="intro-pular">clique para pular</div>
+</div>
+<script>
+(function () {
+    var intro = document.getElementById("intro");
+    if (!intro) return;
+    var pular = false;
+    try {
+        pular = window.matchMedia("(prefers-reduced-motion: reduce)").matches || sessionStorage.getItem("fracture-intro-mestre") === "1";
+    } catch (e) {}
+    if (pular) { intro.remove(); return; }
+    try { sessionStorage.setItem("fracture-intro-mestre", "1"); } catch (e) {}
+    var saindo = false, t1;
+    function sair() {
+        if (saindo) return;
+        saindo = true;
+        clearTimeout(t1);
+        intro.classList.add("saindo");
+        setTimeout(function () { intro.remove(); }, 1050);
+    }
+    t1 = setTimeout(sair, 2100);
+    intro.addEventListener("click", sair);
+    document.addEventListener("keydown", sair, { once: true });
+})();
+</script>
+
+
+<div class="masthead">
+<h1><span>FRACTURE</span> — MESTRE</h1>
+<div style="display:flex; gap:18px; flex-wrap:wrap;">
+<div class="status-salvo" id="nuvemStatus"><span class="dot"></span><span id="nuvemStatusTexto">nuvem: desconectada</span></div>
+<div class="status-salvo" id="statusSalvo"><span class="dot"></span><span id="statusSalvoTexto">ainda não salvo</span></div>
+</div>
+</div>
+
+<div class="fracture-line"></div>
+
+<div class="box">
+<h2>Ações</h2>
+<div class="botoes">
+<button type="button" id="btnImportar">Importar fichas</button>
+<button type="button" id="btnInimigo">+ Nova ficha</button>
+<div class="novo-grupo">
+<input id="novoGrupoNome" placeholder="Nome do grupo">
+<button type="button" id="btnGrupo">+ Criar grupo</button>
+</div>
+<button type="button" class="neutro" id="btnBackup">Baixar backup</button>
+<button type="button" class="neutro" id="btnRestaurar">Restaurar backup</button>
+</div>
+<div class="botoes" style="margin-top: 12px;">
+<div class="novo-grupo">
+<input id="mesaCodigo" placeholder="Código da mesa (8+ caracteres)" style="width: 260px;">
+<button type="button" id="btnMesaConectar">Conectar à mesa</button>
+<button type="button" class="neutro" id="btnMesaSair" hidden>Desconectar</button>
+</div>
+</div>
+<input type="file" id="fileFichas" accept=".json,application/json" multiple hidden>
+<input type="file" id="fileBackup" accept=".json,application/json" hidden>
+<p class="nota" id="msg">Importe as fichas dos jogadores (botão "Baixar ficha" na ficha deles) ou crie uma ficha nova. Clique em "Abrir ficha" em qualquer card para ver e editar a ficha completa.</p>
+</div>
+
+<div id="painel"></div>
+
+<div class="modal-ficha" id="fichaModal" hidden>
+<div class="ficha-janela">
+<div class="ficha-topo">
+<strong id="fichaTitulo">Ficha</strong>
+<div class="botoes">
+<button type="button" data-action="baixar-ficha">Baixar ficha</button>
+<button type="button" class="neutro" data-action="fechar-ficha">Fechar ✕</button>
+</div>
+</div>
+<div class="ficha-nota" id="fichaNota" hidden>Ficha ao vivo: quem manda é o jogador. Alterações aqui (exceto vida e energia) são sobrescritas na próxima atualização dele.</div>
+<div class="ficha-corpo" id="fichaCorpo"></div>
+</div>
+</div>
+
+<div class="modal" id="cropModal" hidden>
+<div class="modal-card">
+<h2>Recortar foto</h2>
+<div class="crop-area" id="cropArea"><img id="cropImg" alt=""></div>
+<p class="crop-dica">Arraste para posicionar e use o zoom para enquadrar.</p>
+<div class="field crop-zoom"><label>Zoom</label><input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1"></div>
+<div class="botoes">
+<button type="button" id="cropConfirmar">Confirmar</button>
+<button type="button" id="cropCancelar" class="neutro">Cancelar</button>
+</div>
+</div>
+</div>
+
+<input type="file" id="fotoInput" accept="image/*" hidden>
+
+<script>
+const STORAGE_KEY = "painel-mestre-fracture";
+
+// Usa o armazenamento do Claude quando existir; em qualquer site (ex: GitHub Pages) usa o localStorage do navegador
+const armazenamento = {
+    async get(chave) {
+        if (window.storage) {
+            const r = await window.storage.get(chave, false);
+            return r && r.value ? r.value : null;
+        }
+        return localStorage.getItem(chave);
+    },
+    async set(chave, valor) {
+        if (window.storage) {
+            await window.storage.set(chave, valor, false);
+            return;
+        }
+        localStorage.setItem(chave, valor);
+    }
+};
+
+const atributoIds = ["fis", "men", "con", "agi", "pre", "von"];
+const atributoNomes = { fis: "Físico", men: "Mental", con: "Constituição", agi: "Agilidade", pre: "Presença", von: "Vontade" };
+const periciasInfo = [
+    { chave: "luta", nome: "Luta", atributo: "fis" },
+    { chave: "diplomacia", nome: "Diplomacia", atributo: "pre" },
+    { chave: "persuasao", nome: "Persuasão", atributo: "pre" },
+    { chave: "enganacao", nome: "Enganação", atributo: "pre" },
+    { chave: "seducao", nome: "Sedução", atributo: "pre" },
+    { chave: "furtividade", nome: "Furtividade", atributo: "agi" },
+    { chave: "distracao", nome: "Distração", atributo: "pre" },
+    { chave: "fuga", nome: "Fuga", atributo: "agi" },
+    { chave: "criminalidade", nome: "Criminalidade", atributo: "men" },
+    { chave: "investigacao", nome: "Investigação", atributo: "men" },
+    { chave: "inteligencia", nome: "Inteligência", atributo: "men" },
+    { chave: "percepcao", nome: "Percepção", atributo: "men" },
+    { chave: "pressentimento", nome: "Pressentimento", atributo: "von" },
+    { chave: "reflexo", nome: "Reflexo", atributo: "agi" },
+    { chave: "pontaria", nome: "Pontaria", atributo: "fis" },
+    { chave: "iniciativa", nome: "Iniciativa", atributo: "agi" },
+    { chave: "controle", nome: "Controle", atributo: "von" },
+    { chave: "resistencia", nome: "Resistência", atributo: "con" },
+    { chave: "determinacao", nome: "Determinação", atributo: "von" },
+    { chave: "tranquilidade", nome: "Tranquilidade", atributo: "von" },
+    { chave: "magia", nome: "Magia", atributo: "von" },
+    { chave: "adestramento", nome: "Adestramento", atributo: "pre" }
+];
+const tiersNomes = ["Treinado", "Especializado", "Mestre"];
+const tiersBonus = [2, 4, 6];
+const execucaoOpts = ["Livre", "Reação", "Movimento", "Padrão", "Completa"];
+const alcanceOpts = ["Pessoal", "Toque", "A Distância"];
+const duracaoOpts = ["Instantânea", "1 rodada", "X rodadas", "Cena"];
+const dadosOpts = [4, 6, 8, 10, 12, 20, 100];
+
+let dados = { grupos: [], fichas: [], semGrupoAberto: true };
+let pronto = false;
+let saveTimeout = null;
+let pendente = null;
+let fichaAbertaId = null;
+const rolStates = {};
+
+/* ---------- Utilidades ---------- */
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function esc(s) {
+    return String(s === undefined || s === null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function num(v, padrao) {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? (padrao === undefined ? 0 : padrao) : n;
+}
+
+function formatarBounty(v) {
+    const d = String(v === undefined || v === null ? "" : v).replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+    return d.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+function achar(id) { return dados.fichas.find(f => f.id === id); }
+function fichaAberta() { return fichaAbertaId ? achar(fichaAbertaId) : null; }
+function msg(texto) { document.getElementById("msg").innerText = texto; }
+
+function marcarStatus(texto, ativo) {
+    document.getElementById("statusSalvoTexto").innerText = texto;
+    document.getElementById("statusSalvo").classList.toggle("ativo", ativo);
+}
+
+function fotoValida(s) { return typeof s === "string" && s.indexOf("data:image/") === 0 ? s : ""; }
+
+/* ---------- Estado padrão e normalização ---------- */
+
+function estadoVazio() {
+    const campos = {
+        nome: "", apelido: "", nivel: "1", bounty: "", universo: "",
+        fis: "1", men: "1", con: "1", agi: "1", pre: "1", von: "1",
+        vidaAtual: "", energiaAtual: "",
+        "arma-nome": "", "arma-desc": "", aparencia: "", historia: ""
+    };
+    for (let i = 1; i <= 6; i++) { campos[`inv${i}-nome`] = ""; campos[`inv${i}-desc`] = ""; }
+    return { versao: 5, campos, pericias: {}, poderes: [], habilidades: [], objetivos: [], foto: "" };
+}
+
+function txt(v) { return v === undefined || v === null ? "" : String(v); }
+
+function completarEstado(est) {
+    const base = estadoVazio();
+    if (!est.campos || typeof est.campos !== "object" || Array.isArray(est.campos)) est.campos = {};
+    Object.keys(base.campos).forEach(k => {
+        if (est.campos[k] === undefined || est.campos[k] === null) est.campos[k] = base.campos[k];
+        else est.campos[k] = String(est.campos[k]);
+    });
+
+    const per = {};
+    if (est.pericias && typeof est.pericias === "object" && !Array.isArray(est.pericias)) {
+        periciasInfo.forEach(p => {
+            const i = est.pericias[p.chave];
+            if (i === 0 || i === 1 || i === 2) per[p.chave] = i;
+        });
+    }
+    est.pericias = per;
+
+    est.poderes = (Array.isArray(est.poderes) ? est.poderes : [])
+        .filter(x => x && typeof x === "object")
+        .map(x => ({ nome: txt(x.nome), descricao: txt(x.descricao) }));
+    est.objetivos = (Array.isArray(est.objetivos) ? est.objetivos : [])
+        .filter(x => x && typeof x === "object")
+        .map(x => ({ nome: txt(x.nome), descricao: txt(x.descricao) }));
+    est.habilidades = (Array.isArray(est.habilidades) ? est.habilidades : [])
+        .filter(x => x && typeof x === "object")
+        .map(x => ({
+            nome: txt(x.nome), descricao: txt(x.descricao),
+            execucao: txt(x.execucao), alcance: txt(x.alcance), duracao: txt(x.duracao),
+            duracaoValor: txt(x.duracaoValor), energia: txt(x.energia),
+            ngc: x.ngc && typeof x.ngc === "object" ? { descricao: txt(x.ngc.descricao), energia: txt(x.ngc.energia) } : null
+        }));
+
+    est.foto = fotoValida(est.foto);
+    est.versao = 5;
+    return est;
+}
+
+function normalizar(d) {
+    const out = { grupos: [], fichas: [], semGrupoAberto: !(d && d.semGrupoAberto === false) };
+    if (!d || typeof d !== "object") return out;
+
+    (Array.isArray(d.grupos) ? d.grupos : []).forEach(g => {
+        if (g && typeof g === "object") {
+            out.grupos.push({ id: String(g.id || uid()), nome: String(g.nome || "Grupo"), aberto: g.aberto !== false });
+        }
+    });
+    const idsGrupos = new Set(out.grupos.map(g => g.id));
+
+    (Array.isArray(d.fichas) ? d.fichas : []).forEach(f => {
+        if (!f || typeof f !== "object") return;
+        let estado = null;
+
+        if (f.estado && typeof f.estado === "object") {
+            estado = completarEstado(f.estado);
+        } else if (f.tipo === "inimigo") {
+            // formato antigo (inimigo simplificado) -> ficha completa
+            estado = estadoVazio();
+            estado.campos.nome = txt(f.nome) || "Inimigo";
+            estado.campos.nivel = String(Math.max(1, num(f.nivel, 1)));
+            atributoIds.forEach(id => { estado.campos[id] = String(Math.max(1, num(f.at && f.at[id], 1))); });
+            estado.campos.vidaAtual = String(Math.max(0, num(f.vidaAtual, 0)));
+            estado.campos.energiaAtual = String(Math.max(0, num(f.energiaAtual, 0)));
+            estado.campos.historia = txt(f.notas);
+        }
+        if (!estado) return;
+
+        out.fichas.push({
+            id: String(f.id || uid()),
+            tipo: f.tipo === "inimigo" ? "inimigo" : "jogador",
+            grupoId: idsGrupos.has(f.grupoId) ? f.grupoId : null,
+            rotulo: txt(f.rotulo),
+            nuvemId: txt(f.nuvemId),
+            estado
+        });
+    });
+    return out;
+}
+
+/* ---------- Regras da ficha (funções puras) ---------- */
+
+function nivelDe(est) { return Math.max(1, num(est.campos.nivel, 1)); }
+function pontosMaximos(nivel) { return 12 + (nivel - 1) * 6; }
+function valorAtributo(est, id) { return Math.max(1, num(est.campos[id], 1)); }
+
+function pontosRestantes(est) {
+    const total = atributoIds.reduce((s, id) => s + valorAtributo(est, id), 0);
+    return pontosMaximos(nivelDe(est)) - (total - 6);
+}
+
+function clampAtributo(est, id, val) {
+    val = Math.max(1, num(val, 1));
+    const outros = atributoIds.filter(a => a !== id).reduce((s, a) => s + valorAtributo(est, a), 0);
+    const permitido = Math.max(1, pontosMaximos(nivelDe(est)) - (outros - 6));
+    return Math.min(val, permitido);
+}
+
+function periciasMaximas(nivel) { return 4 + Math.floor((nivel - 1) / 5); }
+function gastoPericias(est) { return Object.values(est.pericias).reduce((s, i) => s + i + 1, 0); }
+function periciasRestantes(est) { return periciasMaximas(nivelDe(est)) - gastoPericias(est); }
+
+function alternarPericia(est, chave, idx) {
+    const atual = est.pericias[chave];
+    if (atual === idx) { delete est.pericias[chave]; return true; }
+    const custoExtra = (idx + 1) - (atual === undefined ? 0 : atual + 1);
+    if (custoExtra > periciasRestantes(est)) return false;
+    est.pericias[chave] = idx;
+    return true;
+}
+
+function bonusPericia(est, chave) {
+    const i = est.pericias[chave];
+    if (i === undefined) return { bonus: 0, tier: "Não treinado" };
+    return { bonus: tiersBonus[i], tier: tiersNomes[i] };
+}
+
+function resumo(f) {
+    const c = f.estado.campos;
+    const at = {};
+    atributoIds.forEach(id => { at[id] = valorAtributo(f.estado, id); });
+    const vidaMax = 20 + at.con * 5;
+    const energiaMax = 20 + at.von * 5;
+    return {
+        nome: String(c.nome || "").trim() || f.rotulo || "Sem nome",
+        apelido: String(c.apelido || "").trim(),
+        nivel: nivelDe(f.estado),
+        at, vidaMax, energiaMax,
+        vidaAtual: c.vidaAtual === "" ? vidaMax : clamp(num(c.vidaAtual, vidaMax), 0, vidaMax),
+        energiaAtual: c.energiaAtual === "" ? energiaMax : clamp(num(c.energiaAtual, energiaMax), 0, energiaMax),
+        bounty: String(c.bounty || "").trim(),
+        foto: fotoValida(f.estado.foto)
+    };
+}
+
+function setRecurso(f, rec, valor) {
+    const r = resumo(f);
+    const max = rec === "vida" ? r.vidaMax : r.energiaMax;
+    f.estado.campos[rec === "vida" ? "vidaAtual" : "energiaAtual"] = String(clamp(num(valor, 0), 0, max));
+}
+
+function proximoNome(nome) {
+    const re = /^(.*?)(?: (\d+))?$/;
+    const base = nome.match(re)[1];
+    let maior = 1;
+    dados.fichas.forEach(x => {
+        const m = resumo(x).nome.match(re);
+        if (m[1] === base) maior = Math.max(maior, m[2] ? parseInt(m[2], 10) : 1);
+    });
+    return base + " " + (maior + 1);
+}
+
+/* ---------- Rolagem ---------- */
+
+function rolUI(id) {
+    if (!rolStates[id]) {
+        rolStates[id] = { pericia: "", atributoLivre: "fis", modPericia: "0", dificuldade: "", rotulo: "", dado: "20", qtd: "1", modDados: "0", historico: [] };
+    }
+    return rolStates[id];
+}
+
+function rolarDado(lados) { return Math.floor(Math.random() * lados) + 1; }
+
+function infoRolagem(est, ui) {
+    const info = periciasInfo.find(p => p.chave === ui.pericia);
+    let atributoId, bonus = 0, tier = "";
+    if (!info) {
+        atributoId = atributoIds.indexOf(ui.atributoLivre) >= 0 ? ui.atributoLivre : "fis";
+    } else {
+        atributoId = info.atributo;
+        const b = bonusPericia(est, info.chave);
+        bonus = b.bonus;
+        tier = b.tier;
+    }
+    const valor = valorAtributo(est, atributoId);
+    const partes = [`${atributoNomes[atributoId]} ${valor}`];
+    if (info) partes.push(`${tier} ${bonus >= 0 ? "+" : ""}${bonus}`);
+    return { info, atributoId, atributoNome: atributoNomes[atributoId], valor, bonus, texto: `${partes.join(" + ")} = ${valor + bonus}` };
+}
+
+function rolarTeste(est, ui) {
+    const r = infoRolagem(est, ui);
+    const modificador = num(ui.modPericia, 0);
+    const d20 = rolarDado(20);
+    const bonusTotal = r.valor + r.bonus + modificador;
+    const total = d20 + bonusTotal;
+
+    let grau = null, corGrau = null;
+    if (String(ui.dificuldade).trim() !== "") {
+        if (total >= num(ui.dificuldade, 0)) { grau = "Sucesso"; corGrau = "sucesso"; }
+        else { grau = "Falha"; corGrau = "falha"; }
+    }
+    return {
+        titulo: r.info ? r.info.nome : `Rolagem livre (${r.atributoNome})`,
+        detalhe: `d20 (${d20}) + ${bonusTotal} = ${total}`,
+        grau, corGrau
+    };
+}
+
+function rolarOutros(ui) {
+    const lados = dadosOpts.indexOf(num(ui.dado, 20)) >= 0 ? num(ui.dado, 20) : 20;
+    const qtd = clamp(num(ui.qtd, 1), 1, 100);
+    const modificador = num(ui.modDados, 0);
+    const resultados = [];
+    let soma = 0;
+    for (let i = 0; i < qtd; i++) { const r = rolarDado(lados); resultados.push(r); soma += r; }
+    const total = soma + modificador;
+    const sufixo = modificador ? ` ${modificador > 0 ? "+" : "-"} ${Math.abs(modificador)}` : "";
+    return {
+        titulo: String(ui.rotulo || "").trim() || `${qtd}d${lados}`,
+        detalhe: `[${resultados.join(" + ")}]${sufixo} = ${total}`,
+        grau: null, corGrau: null
+    };
+}
+
+/* ---------- HTML: cards da lista ---------- */
+
+function recursoHtml(f, rec, rotulo, atual, max) {
+    const pct = max > 0 ? clamp(atual / max * 100, 0, 100) : 0;
+    const botoes = [-5, -1, 1, 5].map(d =>
+        `<button type="button" class="btn-mini neutro" data-action="ajuste" data-rec="${rec}" data-delta="${d}" data-id="${f.id}">${d > 0 ? "+" : "−"}${Math.abs(d)}</button>`
+    ).join("");
+    return `
+        <div>
+            <div class="recurso-linha">
+                <span class="rotulo">${rotulo}</span>
+                <input type="number" class="num" data-action="set-${rec}" data-id="${f.id}" value="${atual}" min="0" max="${max}">
+                <span class="max">/ ${max}</span>
+                <div class="ajustes">${botoes}</div>
+            </div>
+            <div class="bar"><div class="fill ${rec === "energia" ? "energia" : ""}" style="width:${pct}%"></div></div>
+        </div>`;
+}
+
+function recursosInner(f) {
+    const r = resumo(f);
+    return recursoHtml(f, "vida", "Vida", r.vidaAtual, r.vidaMax) + recursoHtml(f, "energia", "Energia", r.energiaAtual, r.energiaMax);
+}
+
+function cardHtml(f) {
+    const r = resumo(f);
+    const caido = r.vidaAtual === 0;
+    const inicial = esc((r.nome.trim()[0] || "?").toUpperCase());
+    const foto = r.foto ? `<img class="mini-foto" src="${esc(r.foto)}" alt="">` : `<div class="mini-foto">${inicial}</div>`;
+    const sub = [r.apelido, `Lv ${r.nivel}`, r.bounty ? `Bounty ${r.bounty}` : "", caido ? "caído" : "", f.nuvemId ? "● ao vivo" : ""].filter(Boolean).join(" · ");
+
+    const opcoesGrupo = [`<option value="">Sem grupo</option>`]
+        .concat(dados.grupos.map(g => `<option value="${esc(g.id)}"${f.grupoId === g.id ? " selected" : ""}>${esc(g.nome)}</option>`))
+        .join("");
+
+    return `
+        <article class="card ${f.tipo}${caido ? " caido" : ""}" data-id="${f.id}">
+            <div class="card-topo">
+                <span class="alca" draggable="true" data-drag="${f.id}" title="Arraste para um grupo">⠿</span>
+                ${foto}
+                <div class="card-titulo">
+                    <strong title="${esc(r.nome)}">${esc(r.nome)}</strong>
+                    <span class="small">${esc(sub)}</span>
+                </div>
+                <button type="button" class="badge ${f.tipo}" data-action="alternar-tipo" data-id="${f.id}" title="Clique para alternar entre Jogador e Inimigo">${f.tipo === "jogador" ? "Jogador" : "Inimigo"}</button>
+            </div>
+            ${recursosInner(f)}
+            <div class="card-acoes">
+                <button type="button" class="btn-mini" data-action="abrir-ficha" data-id="${f.id}">Abrir ficha</button>
+                <button type="button" class="btn-mini neutro" data-action="duplicar" data-id="${f.id}">Duplicar</button>
+                <select data-action="mover" data-id="${f.id}" title="Mover para um grupo">${opcoesGrupo}</select>
+                <span class="espaco"></span>
+                <button type="button" class="btn-mini neutro" data-action="remover" data-id="${f.id}">Remover</button>
+            </div>
+        </article>`;
+}
+
+function secaoHtml(grupo) {
+    const id = grupo ? grupo.id : "";
+    const fichas = dados.fichas.filter(f => (f.grupoId || "") === id);
+    const aberto = grupo ? grupo.aberto : dados.semGrupoAberto;
+
+    const nome = grupo
+        ? `<input class="grupo-nome" data-action="renomear-grupo" data-id="${esc(id)}" value="${esc(grupo.nome)}" aria-label="Nome do grupo">`
+        : `<span class="grupo-nome-fixo">Sem grupo</span>`;
+
+    const corpo = fichas.length
+        ? `<div class="painel-grid">${fichas.map(cardHtml).join("")}</div>`
+        : `<div class="grupo-vazio">Nenhuma ficha aqui. Arraste uma ficha pelo ⠿ ou use o seletor de grupo no card.</div>`;
+
+    return `
+        <section class="grupo" data-grupo="${esc(id)}">
+            <div class="grupo-topo">
+                <button type="button" class="chev" data-action="toggle-grupo" data-id="${esc(id)}">${aberto ? "▾" : "▸"}</button>
+                ${nome}
+                <span class="contagem">${fichas.length}</span>
+                ${grupo ? `<button type="button" class="btn-mini" data-action="remover-grupo" data-id="${esc(id)}">Excluir grupo</button>` : ""}
+            </div>
+            ${aberto ? corpo : ""}
+        </section>`;
+}
+
+function render() {
+    const cont = document.getElementById("painel");
+    if (dados.fichas.length === 0 && dados.grupos.length === 0) {
+        cont.innerHTML = `<div class="box"><p class="vazio-geral">Nada por aqui ainda. Importe as fichas dos jogadores, crie uma ficha nova ou comece criando um grupo (por exemplo, "Party" e "Inimigos da cena").</p></div>`;
+        return;
+    }
+    cont.innerHTML = dados.grupos.map(secaoHtml).join("") + secaoHtml(null);
+}
+
+function atualizarCard(id) {
+    const f = achar(id);
+    const el = document.querySelector(`.card[data-id="${id}"]`);
+    if (!f || !el) { render(); return; }
+    el.outerHTML = cardHtml(f);
+}
+
+/* ---------- HTML: ficha completa ---------- */
+
+function fotoInner(est) {
+    const foto = fotoValida(est.foto);
+    return `<div class="foto" data-action="foto-escolher" role="button" tabindex="0" title="Escolher foto do personagem">${foto ? `<img src="${esc(foto)}" alt="Foto do personagem">` : `<span>+ Foto</span>`}</div>`
+        + (foto ? `<button type="button" class="btn-mini neutro" data-action="foto-remover">remover foto</button>` : "");
+}
+
+function infoHtml(f) {
+    const c = f.estado.campos;
+    const campo = (rot, k) => `<div class="field"><label>${rot}</label><input data-k="${k}" value="${esc(c[k])}" placeholder="${rot}"></div>`;
+    return `
+        <div class="box">
+            <h2>Informações</h2>
+            <div class="info-layout">
+                <div class="foto-wrap" id="sf-fotowrap">${fotoInner(f.estado)}</div>
+                <div class="row info-campos">
+                    ${campo("Nome", "nome")}
+                    ${campo("Apelido", "apelido")}
+                    <div class="field" style="flex: 0 1 90px;"><label>Level</label><input type="number" min="1" data-k="nivel" value="${esc(c.nivel)}"></div>
+                    <div class="field"><label>Bounty</label><input data-k="bounty" inputmode="numeric" placeholder="0" value="${esc(c.bounty)}"></div>
+                    ${campo("Universo", "universo")}
+                </div>
+            </div>
+        </div>`;
+}
+
+function statusHtml(f) {
+    const est = f.estado;
+    const rest = pontosRestantes(est);
+    const linhas = atributoIds.map(id =>
+        `<div class="status-row"><span>${atributoNomes[id]}</span><input type="number" min="1" data-stat="${id}" value="${esc(est.campos[id])}"></div>`
+    ).join("");
+    return `
+        <div class="box">
+            <h2>Status</h2>
+            <div class="pontos-restantes${rest < 0 ? " aviso" : ""}" id="sf-pontos-box">Pontos restantes: <b id="sf-pontos">${rest}</b><span class="aviso-texto">— reduza um atributo</span></div>
+            <div class="status-grid">${linhas}</div>
+        </div>`;
+}
+
+function histHtml(ui) {
+    if (!ui.historico.length) return `<p class="nota" style="margin:0;">Nenhuma rolagem ainda nesta sessão.</p>`;
+    return ui.historico.map(item => `
+        <div class="card-dinamico historico-item">
+            <div class="linha-topo">
+                <strong>${esc(item.titulo)}</strong>
+                ${item.grau ? `<span class="grau-badge grau-${item.corGrau}">${esc(item.grau)}</span>` : ""}
+            </div>
+            <div class="small">${esc(item.detalhe)}</div>
+        </div>`).join("");
+}
+
+function rolagemHtml(f) {
+    const ui = rolUI(f.id);
+    const perOpts = `<option value="">— Rolagem livre —</option>` + periciasInfo.map(p => `<option value="${p.chave}"${ui.pericia === p.chave ? " selected" : ""}>${p.nome}</option>`).join("");
+    const atrOpts = atributoIds.map(a => `<option value="${a}"${ui.atributoLivre === a ? " selected" : ""}>${atributoNomes[a]}</option>`).join("");
+    const dadoOpts = dadosOpts.map(d => `<option value="${d}"${String(d) === String(ui.dado) ? " selected" : ""}>d${d}</option>`).join("");
+    return `
+        <div class="box">
+            <h2>Rolagem</h2>
+            <h3>Teste de Perícia</h3>
+            <div class="row">
+                <div class="field"><label>Perícia</label><select data-r="pericia">${perOpts}</select></div>
+                <div class="field" id="sf-atr-livre" style="flex: 1 1 140px;${ui.pericia === "" ? "" : "display:none;"}"><label>Atributo</label><select data-r="atributoLivre">${atrOpts}</select></div>
+                <div class="field" style="flex: 0 1 100px;"><label>Modificador</label><input type="number" data-r="modPericia" value="${esc(ui.modPericia)}"></div>
+                <div class="field" style="flex: 0 1 110px;"><label>Dificuldade</label><input type="number" data-r="dificuldade" value="${esc(ui.dificuldade)}" placeholder="opcional"></div>
+            </div>
+            <div class="small" id="sf-rol-info" style="margin-top: 6px;">${esc(infoRolagem(f.estado, ui).texto)}</div>
+            <button type="button" data-action="rolar-teste" style="margin-top: 10px;">🎲 Rolar teste</button>
+
+            <h3>Outros Dados</h3>
+            <div class="row">
+                <div class="field"><label>Rótulo</label><input data-r="rotulo" value="${esc(ui.rotulo)}" placeholder="ex: Dano — Espada Longa"></div>
+                <div class="field" style="flex: 0 1 90px;"><label>Dado</label><select data-r="dado">${dadoOpts}</select></div>
+                <div class="field" style="flex: 0 1 80px;"><label>Quantidade</label><input type="number" min="1" data-r="qtd" value="${esc(ui.qtd)}"></div>
+                <div class="field" style="flex: 0 1 100px;"><label>Modificador</label><input type="number" data-r="modDados" value="${esc(ui.modDados)}"></div>
+            </div>
+            <button type="button" data-action="rolar-dados" style="margin-top: 10px;">🎲 Rolar dados</button>
+
+            <h3>Histórico</h3>
+            <div class="lista-dinamica" id="sf-hist">${histHtml(ui)}</div>
+        </div>`;
+}
+
+function periciasBoxHtml(est) {
+    const rest = periciasRestantes(est);
+    const linhas = periciasInfo.map(p => {
+        const atual = est.pericias[p.chave];
+        const radios = [0, 1, 2].map(i => {
+            const marcado = atual === i;
+            const custoExtra = (i + 1) - (atual === undefined ? 0 : atual + 1);
+            const desabilitado = !marcado && custoExtra > rest;
+            return `<input type="radio" data-per="${p.chave}" data-idx="${i}"${marcado ? " checked" : ""}${desabilitado ? " disabled" : ""}>`;
+        }).join("");
+        return `<div class="linha"><div>${p.nome} <span class="small">(${atributoNomes[p.atributo]})</span></div>${radios}</div>`;
+    }).join("");
+    return `
+        <h2>Perícias</h2>
+        <div class="pontos-restantes${rest < 0 ? " aviso" : ""}">Perícias restantes: <b>${rest}</b><span class="aviso-texto">— acima do limite do level</span></div>
+        <div class="pericias-tabela">
+            <div class="linha header"><div>Perícia</div><div>Treinado</div><div>Especializado</div><div>Mestre</div></div>
+            ${linhas}
+        </div>`;
+}
+
+function itemSimplesHtml(lista, arr, phNome) {
+    return arr.map((x, i) => `
+        <div class="card-dinamico">
+            <div class="linha-topo">
+                <input data-list="${lista}" data-i="${i}" data-p="nome" placeholder="${phNome}" value="${esc(x.nome)}">
+                <button type="button" class="botao-remover" data-action="rm-item" data-list="${lista}" data-i="${i}" title="Remover">×</button>
+            </div>
+            <textarea data-list="${lista}" data-i="${i}" data-p="descricao" rows="2" placeholder="Descrição">${esc(x.descricao)}</textarea>
+        </div>`).join("");
+}
+
+function poderesHtml(est) { return itemSimplesHtml("poderes", est.poderes, "Nome do poder"); }
+function objetivosHtml(est) { return itemSimplesHtml("objetivos", est.objetivos, "Sonho / Objetivo"); }
+
+function habilidadesHtml(est) {
+    return est.habilidades.map((h, i) => {
+        const sel = (p, lista) => `<select data-list="habilidades" data-i="${i}" data-p="${p}"><option value="">Selecione</option>${lista.map(o => `<option value="${esc(o)}"${h[p] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
+        const extra = h.duracao === "X rodadas"
+            ? `<div class="field energia-campo"><label>Quantas rodadas</label><input data-list="habilidades" data-i="${i}" data-p="duracaoValor" placeholder="X" value="${esc(h.duracaoValor)}"></div>`
+            : "";
+        const ngc = h.ngc
+            ? `<div class="ngc-secao">
+                    <div class="ngc-titulo"><span>Versão Aprimorada</span><button type="button" class="botao-remover" data-action="rm-ngc" data-i="${i}" title="Remover versão aprimorada">×</button></div>
+                    <textarea data-list="habilidades" data-i="${i}" data-p="ngc.descricao" rows="2" placeholder="O que muda nesta versão">${esc(h.ngc.descricao)}</textarea>
+                    <div class="field energia-campo"><label>Gasto de Energia</label><input data-list="habilidades" data-i="${i}" data-p="ngc.energia" placeholder="X" value="${esc(h.ngc.energia)}"></div>
+               </div>`
+            : `<button type="button" class="botao-ngc" data-action="add-ngc" data-i="${i}">+ Versão aprimorada</button>`;
+        return `
+            <div class="card-dinamico">
+                <div class="linha-topo">
+                    <input data-list="habilidades" data-i="${i}" data-p="nome" placeholder="Nome da habilidade" value="${esc(h.nome)}">
+                    <button type="button" class="botao-remover" data-action="rm-item" data-list="habilidades" data-i="${i}" title="Remover habilidade">×</button>
+                </div>
+                <textarea data-list="habilidades" data-i="${i}" data-p="descricao" rows="2" placeholder="Descrição">${esc(h.descricao)}</textarea>
+                <div class="campos-habilidade">
+                    <div class="field"><label>Execução</label>${sel("execucao", execucaoOpts)}</div>
+                    <div class="field"><label>Alcance</label>${sel("alcance", alcanceOpts)}</div>
+                    <div class="field"><label>Duração</label>${sel("duracao", duracaoOpts)}${extra}</div>
+                </div>
+                <div class="field energia-campo"><label>Gasto de Energia</label><input data-list="habilidades" data-i="${i}" data-p="energia" placeholder="X" value="${esc(h.energia)}"></div>
+                <div>${ngc}</div>
+            </div>`;
+    }).join("");
+}
+
+const renderersLista = { poderes: poderesHtml, habilidades: habilidadesHtml, objetivos: objetivosHtml };
+
+function equipamentosHtml(f) {
+    const c = f.estado.campos;
+    let inv = "";
+    for (let i = 1; i <= 6; i++) {
+        inv += `<div class="item-card"><input data-k="inv${i}-nome" placeholder="Nome do item" value="${esc(c[`inv${i}-nome`])}"><textarea data-k="inv${i}-desc" rows="2" placeholder="Descrição">${esc(c[`inv${i}-desc`])}</textarea></div>`;
+    }
+    return `
+        <div class="box">
+            <h2>Equipamentos</h2>
+            <h3>Inventário (6 slots)</h3>
+            <div class="item-grid">${inv}</div>
+            <h3>Arma Principal</h3>
+            <div class="item-card"><input data-k="arma-nome" placeholder="Nome da arma" value="${esc(c["arma-nome"])}"><textarea data-k="arma-desc" rows="2" placeholder="Descrição">${esc(c["arma-desc"])}</textarea></div>
+            <h3>Poderes</h3>
+            <div class="lista-dinamica" id="sf-lista-poderes">${poderesHtml(f.estado)}</div>
+            <button type="button" class="botao-add" data-action="add-item" data-list="poderes">+ Adicionar poder</button>
+            <h3>Habilidades</h3>
+            <div class="lista-dinamica" id="sf-lista-habilidades">${habilidadesHtml(f.estado)}</div>
+            <button type="button" class="botao-add" data-action="add-item" data-list="habilidades">+ Adicionar habilidade</button>
+        </div>`;
+}
+
+function fichaHtml(f) {
+    const c = f.estado.campos;
+    return `
+        ${infoHtml(f)}
+        ${statusHtml(f)}
+        <div class="box"><h2>Recursos</h2><div id="sf-recursos">${recursosInner(f)}</div></div>
+        ${rolagemHtml(f)}
+        <div class="box" id="sf-pericias-box">${periciasBoxHtml(f.estado)}</div>
+        ${equipamentosHtml(f)}
+        <div class="box"><h2>Aparência</h2><textarea data-k="aparencia" rows="3">${esc(c.aparencia)}</textarea></div>
+        <div class="box">
+            <h2>Objetivos / Sonhos</h2>
+            <div class="lista-dinamica" id="sf-lista-objetivos">${objetivosHtml(f.estado)}</div>
+            <button type="button" class="botao-add" data-action="add-item" data-list="objetivos">+ Adicionar objetivo</button>
+        </div>
+        <div class="box"><h2>História</h2><textarea data-k="historia" rows="4">${esc(c.historia)}</textarea></div>`;
+}
+
+/* ---------- Atualizações parciais da ficha aberta ---------- */
+
+function atualizarPontos(f) {
+    const rest = pontosRestantes(f.estado);
+    document.getElementById("sf-pontos").innerText = rest;
+    document.getElementById("sf-pontos-box").classList.toggle("aviso", rest < 0);
+}
+
+function atualizarRecursosModal(f) {
+    const r = resumo(f);
+    const c = f.estado.campos;
+    if (c.vidaAtual !== "" && num(c.vidaAtual, 0) > r.vidaMax) c.vidaAtual = String(r.vidaMax);
+    if (c.energiaAtual !== "" && num(c.energiaAtual, 0) > r.energiaMax) c.energiaAtual = String(r.energiaMax);
+    document.getElementById("sf-recursos").innerHTML = recursosInner(f);
+}
+
+function atualizarPericiasBox(f) {
+    document.getElementById("sf-pericias-box").innerHTML = periciasBoxHtml(f.estado);
+}
+
+function atualizarRolInfo(f) {
+    const ui = rolUI(f.id);
+    document.getElementById("sf-rol-info").innerText = infoRolagem(f.estado, ui).texto;
+    document.getElementById("sf-atr-livre").style.display = ui.pericia === "" ? "flex" : "none";
+}
+
+function atualizarLista(lista) {
+    const f = fichaAberta();
+    if (!f) return;
+    document.getElementById("sf-lista-" + lista).innerHTML = renderersLista[lista](f.estado);
+}
+
+function setPropLista(est, lista, i, prop, valor) {
+    const item = est[lista] && est[lista][i];
+    if (!item) return;
+    if (prop.indexOf("ngc.") === 0) {
+        if (!item.ngc) item.ngc = { descricao: "", energia: "" };
+        item.ngc[prop.slice(4)] = valor;
+    } else {
+        item[prop] = valor;
+    }
+}
+
+function refrescarRecursos(id) {
+    atualizarCard(id);
+    const f = fichaAberta();
+    if (f && f.id === id) atualizarRecursosModal(f);
+}
+
+/* ---------- Abrir / fechar ficha ---------- */
+
+function abrirFicha(id) {
+    const f = achar(id);
+    if (!f) return;
+    fichaAbertaId = id;
+    document.getElementById("fichaNota").hidden = !f.nuvemId;
+    document.getElementById("fichaTitulo").innerText = resumo(f).nome;
+    document.getElementById("fichaCorpo").innerHTML = fichaHtml(f);
+    document.getElementById("fichaCorpo").scrollTop = 0;
+    document.getElementById("fichaModal").hidden = false;
+    document.body.style.overflow = "hidden";
+}
+
+function fecharFicha() {
+    fichaAbertaId = null;
+    document.getElementById("fichaModal").hidden = true;
+    document.getElementById("fichaCorpo").innerHTML = "";
+    document.body.style.overflow = "";
+    render();
+}
+
+function baixarFicha(id) {
+    const f = achar(id);
+    if (!f) return;
+    const nome = resumo(f).nome.replace(/[\\/:*?"<>|]+/g, "").trim().replace(/\s+/g, "-") || "Personagem";
+    const blob = new Blob([JSON.stringify(f.estado, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `Ficha-${nome}.json`;
+    a.click();
+    msg(`Ficha de ${resumo(f).nome} baixada. O jogador pode importar esse arquivo na ficha dele.`);
+}
+
+/* ---------- Foto + recorte quadrado ---------- */
+
+const CROP_SIZE = 280;
+const FOTO_SAIDA = 400;
+const cropState = { w: 0, h: 0, base: 1, zoom: 1, x: 0, y: 0 };
+let cropAlvoId = null;
+let arrastando = null;
+
+function aplicarCrop() {
+    const img = document.getElementById("cropImg");
+    const s = cropState.base * cropState.zoom;
+    cropState.x = Math.min(0, Math.max(CROP_SIZE - cropState.w * s, cropState.x));
+    cropState.y = Math.min(0, Math.max(CROP_SIZE - cropState.h * s, cropState.y));
+    img.style.width = (cropState.w * s) + "px";
+    img.style.height = (cropState.h * s) + "px";
+    img.style.left = cropState.x + "px";
+    img.style.top = cropState.y + "px";
+}
+
+function abrirCrop(dataUrl) {
+    const img = document.getElementById("cropImg");
+    img.onload = () => {
+        cropState.w = img.naturalWidth;
+        cropState.h = img.naturalHeight;
+        cropState.base = CROP_SIZE / Math.min(cropState.w, cropState.h);
+        cropState.zoom = 1;
+        document.getElementById("cropZoom").value = 1;
+        cropState.x = (CROP_SIZE - cropState.w * cropState.base) / 2;
+        cropState.y = (CROP_SIZE - cropState.h * cropState.base) / 2;
+        aplicarCrop();
+    };
+    img.removeAttribute("src");
+    img.src = dataUrl;
+    cropAlvoId = fichaAbertaId;
+    document.getElementById("cropModal").hidden = false;
+}
+
+function fecharCrop() {
+    document.getElementById("cropModal").hidden = true;
+    document.getElementById("cropImg").removeAttribute("src");
+    cropAlvoId = null;
+}
+
+function confirmarCrop() {
+    const f = cropAlvoId ? achar(cropAlvoId) : null;
+    if (f) {
+        const img = document.getElementById("cropImg");
+        const s = cropState.base * cropState.zoom;
+        const canvas = document.createElement("canvas");
+        canvas.width = FOTO_SAIDA;
+        canvas.height = FOTO_SAIDA;
+        canvas.getContext("2d").drawImage(img, -cropState.x / s, -cropState.y / s, CROP_SIZE / s, CROP_SIZE / s, 0, 0, FOTO_SAIDA, FOTO_SAIDA);
+        f.estado.foto = canvas.toDataURL("image/jpeg", 0.85);
+        document.getElementById("sf-fotowrap").innerHTML = fotoInner(f.estado);
+        agendarSalvar();
+    }
+    fecharCrop();
+}
+
+/* ---------- Salvamento ---------- */
+
+async function salvar() {
+    try {
+        await armazenamento.set(STORAGE_KEY, JSON.stringify(dados));
+        const agora = new Date();
+        marcarStatus(`salvo às ${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`, true);
+    } catch (err) {
+        console.error("Erro ao salvar painel:", err);
+        marcarStatus("erro ao salvar", false);
+    }
+}
+
+function agendarSalvar() {
+    if (!pronto) return;
+    marcarStatus("salvando…", false);
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(salvar, 400);
+}
+
+function mudou() {
+    agendarSalvar();
+    render();
+}
+
+/* ---------- Confirmação em dois cliques (sem janelas de diálogo) ---------- */
+
+function cancelarPendente() {
+    if (!pendente) return;
+    clearTimeout(pendente.timer);
+    if (pendente.btn.isConnected) {
+        pendente.btn.textContent = pendente.original;
+        pendente.btn.classList.remove("confirmando");
+    }
+    pendente = null;
+}
+
+function pedirConfirmacao(btn, chave, fn) {
+    if (pendente && pendente.chave === chave) {
+        clearTimeout(pendente.timer);
+        pendente = null;
+        fn();
+        return;
+    }
+    cancelarPendente();
+    const original = btn.textContent;
+    btn.textContent = "Certeza?";
+    btn.classList.add("confirmando");
+    pendente = { chave, btn, original, timer: setTimeout(cancelarPendente, 3000) };
+}
+
+/* ---------- Ações da lista ---------- */
+
+function mover(id, grupoId) {
+    const f = achar(id);
+    if (!f) return;
+    f.grupoId = grupoId || null;
+    mudou();
+}
+
+function criarFicha() {
+    const estado = estadoVazio();
+    estado.campos.nome = "Novo personagem";
+    dados.fichas.push({ id: uid(), tipo: "inimigo", grupoId: null, rotulo: "", estado });
+    mudou();
+    msg("Ficha criada em \"Sem grupo\" (marcada como Inimigo; clique na etiqueta do card para alternar). Use \"Abrir ficha\" para preencher.");
+}
+
+function criarGrupo() {
+    const input = document.getElementById("novoGrupoNome");
+    const nome = input.value.trim() || `Grupo ${dados.grupos.length + 1}`;
+    dados.grupos.push({ id: uid(), nome, aberto: true });
+    input.value = "";
+    mudou();
+    msg(`Grupo "${nome}" criado.`);
+}
+
+async function importarArquivos(files) {
+    let novos = 0, atualizados = 0;
+    const erros = [];
+
+    for (const file of files) {
+        try {
+            const est = JSON.parse(await file.text());
+            if (est && Array.isArray(est.fichas) && Array.isArray(est.grupos)) {
+                throw new Error("esse é um backup do painel, use \"Restaurar backup\"");
+            }
+            if (!est || typeof est.campos !== "object" || est.campos === null) {
+                throw new Error("não parece uma ficha do Fracture");
+            }
+
+            completarEstado(est);
+            const rotulo = file.name.replace(/\.json$/i, "");
+            const nome = (String(est.campos.nome || "").trim() || rotulo).toLowerCase();
+            const existente = dados.fichas.find(f => f.tipo === "jogador" && resumo(f).nome.toLowerCase() === nome);
+
+            if (existente) {
+                existente.estado = est;
+                atualizados++;
+            } else {
+                dados.fichas.push({ id: uid(), tipo: "jogador", grupoId: null, rotulo, estado: est });
+                novos++;
+            }
+        } catch (err) {
+            erros.push(`${file.name}: ${err.message}`);
+        }
+    }
+
+    mudou();
+    const partes = [];
+    if (novos) partes.push(`${novos} ficha(s) adicionada(s)`);
+    if (atualizados) partes.push(`${atualizados} atualizada(s)`);
+    if (erros.length) partes.push(`não foi possível ler: ${erros.join("; ")}`);
+    msg(partes.join(" · ") || "Nenhum arquivo selecionado.");
+}
+
+function baixarBackup() {
+    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Painel-Mestre-Fracture.json";
+    a.click();
+    msg("Backup baixado.");
+}
+
+async function restaurarBackup(file) {
+    try {
+        const d = JSON.parse(await file.text());
+        if (!d || !Array.isArray(d.fichas) || !Array.isArray(d.grupos)) throw new Error("arquivo inválido");
+        dados = normalizar(d);
+        mudou();
+        msg("Backup restaurado.");
+    } catch (err) {
+        msg(`Não foi possível restaurar: ${err.message}`);
+    }
+}
+
+/* ---------- Mesa online (Firebase) ---------- */
+
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDeXqt0I7nye8yq-6JULEZsXd7y9NRowXQ",
+    authDomain: "fracturerpg-1904d.firebaseapp.com",
+    projectId: "fracturerpg-1904d",
+    storageBucket: "fracturerpg-1904d.firebasestorage.app",
+    messagingSenderId: "192300879704",
+    appId: "1:192300879704:web:ec92ced11512faa576df2d"
+};
+const FIREBASE_VERSAO = "10.12.2";
+const MESA_KEY = "fracture-mesa-mestre";
+
+const nuvem = { app: null, db: null, fs: null };
+let mesaAtual = "";
+let mesaUnsub = null;
+let ultimoMestreTs = 0;
+
+async function nuvemIniciarSdk() {
+    if (nuvem.db) return;
+    const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSAO}`;
+    const [appMod, fs] = await Promise.all([
+        import(`${base}/firebase-app.js`),
+        import(`${base}/firebase-firestore.js`)
+    ]);
+    nuvem.app = appMod.initializeApp(FIREBASE_CONFIG);
+    nuvem.fs = fs;
+    nuvem.db = fs.initializeFirestore(nuvem.app, { experimentalAutoDetectLongPolling: true });
+}
+
+function nuvemErro(err) {
+    const codigo = err && err.code ? String(err.code) : "";
+    if (codigo.indexOf("permission-denied") >= 0) return "sem permissão (confira o código e as regras do Firestore)";
+    if (codigo.indexOf("unavailable") >= 0) return "sem conexão com a nuvem";
+    if (err && /API key/i.test(String(err.message))) return "chave de API inválida (confira o FIREBASE_CONFIG)";
+    if (err && /import|fetch|Failed to load|module/i.test(String(err.message))) return "não foi possível carregar o Firebase (sem internet?)";
+    return "erro (" + (err && err.message ? err.message : "desconhecido") + ")";
+}
+
+function nuvemStatus(texto, ativo) {
+    document.getElementById("nuvemStatusTexto").innerText = texto;
+    document.getElementById("nuvemStatus").classList.toggle("ativo", !!ativo);
+}
+
+function atualizarUiMesa() {
+    const conectado = !!mesaAtual;
+    document.getElementById("btnMesaConectar").hidden = conectado;
+    document.getElementById("btnMesaSair").hidden = !conectado;
+    document.getElementById("mesaCodigo").disabled = conectado;
+}
+
+// Converte o registro da nuvem em ficha do painel. Retorna { ficha, nova } ou null se os dados estiverem ilegíveis.
+function aplicarDadosNuvem(docId, d) {
+    let estado;
+    try { estado = completarEstado(JSON.parse(d.dados)); } catch (err) { return null; }
+
+    // alteração de vida/energia do mestre que o jogador ainda não aplicou
+    const tsMestre = Number(d.mestreTs) || 0;
+    if (tsMestre > (Number(d.aplicouMestreTs) || 0)) {
+        if (d.mestreVida !== undefined && d.mestreVida !== null) estado.campos.vidaAtual = String(d.mestreVida);
+        if (d.mestreEnergia !== undefined && d.mestreEnergia !== null) estado.campos.energiaAtual = String(d.mestreEnergia);
+    }
+
+    let f = dados.fichas.find(x => x.nuvemId === docId);
+    if (f) {
+        f.estado = estado;
+        return { ficha: f, nova: false };
+    }
+
+    // ficha importada por arquivo com o mesmo nome: adota o vínculo em vez de duplicar
+    const nome = String(estado.campos.nome || "").trim().toLowerCase();
+    if (nome) {
+        f = dados.fichas.find(x => x.tipo === "jogador" && !x.nuvemId && resumo(x).nome.toLowerCase() === nome);
+        if (f) {
+            f.nuvemId = docId;
+            f.estado = estado;
+            return { ficha: f, nova: false };
+        }
+    }
+
+    f = { id: uid(), tipo: "jogador", grupoId: null, rotulo: "", nuvemId: docId, estado };
+    dados.fichas.push(f);
+    return { ficha: f, nova: true };
+}
+
+function mesaReceber(snap) {
+    let precisaRender = false;
+    const atualizadas = [];
+
+    snap.docChanges().forEach(ch => {
+        if (ch.type === "removed") return;
+        const r = aplicarDadosNuvem(ch.doc.id, ch.doc.data());
+        if (!r) return;
+        if (r.nova) precisaRender = true;
+        else atualizadas.push(r.ficha.id);
+
+        if (fichaAbertaId === r.ficha.id) {
+            const corpo = document.getElementById("fichaCorpo");
+            const topo = corpo.scrollTop;
+            corpo.innerHTML = fichaHtml(r.ficha);
+            corpo.scrollTop = topo;
+            document.getElementById("fichaTitulo").innerText = resumo(r.ficha).nome;
+        }
+    });
+
+    if (precisaRender) render();
+    else atualizadas.forEach(id => atualizarCard(id));
+
+    agendarSalvar();
+    nuvemStatus(`mesa conectada · ${snap.size} ficha(s) online`, true);
+}
+
+async function mesaConectar(codigo) {
+    codigo = String(codigo || "").trim();
+    if (codigo.length < 8) {
+        nuvemStatus("código: mínimo de 8 caracteres", false);
+        return;
+    }
+    nuvemStatus("conectando…", false);
+    try {
+        await nuvemIniciarSdk();
+        if (mesaUnsub) { mesaUnsub(); mesaUnsub = null; }
+        mesaAtual = codigo;
+        try { await armazenamento.set(MESA_KEY, codigo); } catch (err) { /* sem problema */ }
+        atualizarUiMesa();
+        mesaUnsub = nuvem.fs.onSnapshot(
+            nuvem.fs.collection(nuvem.db, "mesas", codigo, "fichas"),
+            mesaReceber,
+            err => { console.error("Erro na mesa:", err); nuvemStatus("nuvem: " + nuvemErro(err), false); }
+        );
+    } catch (err) {
+        console.error("Erro ao conectar:", err);
+        mesaAtual = "";
+        atualizarUiMesa();
+        nuvemStatus("nuvem: " + nuvemErro(err), false);
+    }
+}
+
+async function mesaDesconectar() {
+    if (mesaUnsub) { mesaUnsub(); mesaUnsub = null; }
+    mesaAtual = "";
+    try { await armazenamento.set(MESA_KEY, ""); } catch (err) { /* sem problema */ }
+    atualizarUiMesa();
+    nuvemStatus("nuvem: desconectada", false);
+}
+
+// Vida e energia que o mestre alterou voltam para a ficha do jogador
+async function sincronizarRecursos(f) {
+    if (!f || !f.nuvemId || !mesaAtual || !nuvem.db) return;
+    const r = resumo(f);
+    // sempre crescente, mesmo que duas alterações caiam no mesmo milissegundo
+    const ts = Math.max(Date.now(), ultimoMestreTs + 1);
+    ultimoMestreTs = ts;
+    try {
+        await nuvem.fs.setDoc(nuvem.fs.doc(nuvem.db, "mesas", mesaAtual, "fichas", f.nuvemId), {
+            mestreVida: r.vidaAtual,
+            mestreEnergia: r.energiaAtual,
+            mestreTs: ts
+        }, { merge: true });
+    } catch (err) {
+        console.error("Erro ao enviar vida/energia:", err);
+        nuvemStatus("nuvem: " + nuvemErro(err), false);
+    }
+}
+
+function removerDaNuvem(f) {
+    if (!f.nuvemId || !mesaAtual || !nuvem.db) return;
+    nuvem.fs.deleteDoc(nuvem.fs.doc(nuvem.db, "mesas", mesaAtual, "fichas", f.nuvemId)).catch(err => console.error("Erro ao remover da nuvem:", err));
+}
+
+/* ---------- Eventos: cliques ---------- */
+
+document.addEventListener("click", e => {
+    const radio = e.target.closest("input[data-per]");
+    if (radio) {
+        const f = fichaAberta();
+        if (!f) return;
+        alternarPericia(f.estado, radio.dataset.per, num(radio.dataset.idx, 0));
+        atualizarPericiasBox(f);
+        atualizarRolInfo(f);
+        agendarSalvar();
+        return;
+    }
+
+    const fotoBox = e.target.closest("[data-action='foto-escolher']");
+    if (fotoBox) { document.getElementById("fotoInput").click(); return; }
+
+    const el = e.target.closest("button[data-action]");
+    if (!el) return;
+    if (pendente && pendente.btn !== el) cancelarPendente();
+
+    const acao = el.dataset.action;
+    const id = el.dataset.id;
+    const f = fichaAberta();
+
+    switch (acao) {
+        case "toggle-grupo": {
+            if (id === "") dados.semGrupoAberto = !dados.semGrupoAberto;
+            else {
+                const g = dados.grupos.find(x => x.id === id);
+                if (g) g.aberto = !g.aberto;
+            }
+            mudou();
+            break;
+        }
+        case "remover-grupo":
+            pedirConfirmacao(el, "rg:" + id, () => {
+                dados.grupos = dados.grupos.filter(g => g.id !== id);
+                dados.fichas.forEach(x => { if (x.grupoId === id) x.grupoId = null; });
+                mudou();
+                msg("Grupo excluído. As fichas que estavam nele foram para \"Sem grupo\".");
+            });
+            break;
+        case "ajuste": {
+            const alvo = achar(id);
+            if (!alvo) break;
+            const r = resumo(alvo);
+            const atual = el.dataset.rec === "vida" ? r.vidaAtual : r.energiaAtual;
+            setRecurso(alvo, el.dataset.rec, atual + num(el.dataset.delta, 0));
+            sincronizarRecursos(alvo);
+            agendarSalvar();
+            refrescarRecursos(id);
+            break;
+        }
+        case "alternar-tipo": {
+            const alvo = achar(id);
+            if (!alvo) break;
+            alvo.tipo = alvo.tipo === "jogador" ? "inimigo" : "jogador";
+            agendarSalvar();
+            atualizarCard(id);
+            break;
+        }
+        case "abrir-ficha":
+            abrirFicha(id);
+            break;
+        case "fechar-ficha":
+            fecharFicha();
+            break;
+        case "baixar-ficha":
+            if (f) baixarFicha(f.id);
+            break;
+        case "duplicar": {
+            const alvo = achar(id);
+            if (!alvo) break;
+            const copia = JSON.parse(JSON.stringify(alvo));
+            copia.id = uid();
+            copia.nuvemId = "";
+            copia.estado.campos.nome = proximoNome(resumo(alvo).nome);
+            copia.estado.campos.vidaAtual = "";
+            copia.estado.campos.energiaAtual = "";
+            dados.fichas.splice(dados.fichas.findIndex(x => x.id === id) + 1, 0, copia);
+            mudou();
+            break;
+        }
+        case "remover":
+            pedirConfirmacao(el, "rf:" + id, () => {
+                const removida = achar(id);
+                if (removida) removerDaNuvem(removida);
+                dados.fichas = dados.fichas.filter(x => x.id !== id);
+                delete rolStates[id];
+                mudou();
+            });
+            break;
+        case "add-item": {
+            if (!f) break;
+            const lista = el.dataset.list;
+            if (lista === "habilidades") {
+                f.estado.habilidades.push({ nome: "", descricao: "", execucao: "", alcance: "", duracao: "", duracaoValor: "", energia: "", ngc: null });
+            } else {
+                f.estado[lista].push({ nome: "", descricao: "" });
+            }
+            atualizarLista(lista);
+            agendarSalvar();
+            break;
+        }
+        case "rm-item": {
+            if (!f) break;
+            f.estado[el.dataset.list].splice(num(el.dataset.i, -1), 1);
+            atualizarLista(el.dataset.list);
+            agendarSalvar();
+            break;
+        }
+        case "add-ngc": {
+            const h = f && f.estado.habilidades[num(el.dataset.i, -1)];
+            if (!h) break;
+            h.ngc = { descricao: "", energia: "" };
+            atualizarLista("habilidades");
+            agendarSalvar();
+            break;
+        }
+        case "rm-ngc": {
+            const h = f && f.estado.habilidades[num(el.dataset.i, -1)];
+            if (!h) break;
+            h.ngc = null;
+            atualizarLista("habilidades");
+            agendarSalvar();
+            break;
+        }
+        case "rolar-teste": {
+            if (!f) break;
+            const ui = rolUI(f.id);
+            ui.historico.unshift(rolarTeste(f.estado, ui));
+            if (ui.historico.length > 3) ui.historico.pop();
+            document.getElementById("sf-hist").innerHTML = histHtml(ui);
+            break;
+        }
+        case "rolar-dados": {
+            if (!f) break;
+            const ui = rolUI(f.id);
+            ui.historico.unshift(rolarOutros(ui));
+            if (ui.historico.length > 3) ui.historico.pop();
+            document.getElementById("sf-hist").innerHTML = histHtml(ui);
+            break;
+        }
+        case "foto-remover":
+            if (!f) break;
+            f.estado.foto = "";
+            document.getElementById("sf-fotowrap").innerHTML = fotoInner(f.estado);
+            agendarSalvar();
+            break;
+    }
+});
+
+/* ---------- Eventos: digitação e seleção ---------- */
+
+document.addEventListener("input", e => {
+    const t = e.target;
+    const f = fichaAberta();
+    if (!f || !t.dataset || t.tagName === "SELECT") return;
+    const est = f.estado;
+
+    if (t.dataset.k !== undefined) {
+        const k = t.dataset.k;
+        if (k === "nivel") {
+            if (t.value === "") return;
+            est.campos.nivel = String(Math.max(1, num(t.value, 1)));
+            atualizarPontos(f);
+            atualizarPericiasBox(f);
+        } else {
+            if (k === "bounty") {
+                const fm = formatarBounty(t.value);
+                if (fm !== t.value) t.value = fm;
+                est.campos[k] = fm;
+            } else {
+                est.campos[k] = t.value;
+            }
+            if (k === "nome") document.getElementById("fichaTitulo").innerText = resumo(f).nome;
+        }
+        agendarSalvar();
+    } else if (t.dataset.stat) {
+        if (t.value === "") return;
+        const id = t.dataset.stat;
+        const v = clampAtributo(est, id, t.value);
+        if (String(v) !== t.value) t.value = v;
+        est.campos[id] = String(v);
+        atualizarPontos(f);
+        atualizarRecursosModal(f);
+        atualizarRolInfo(f);
+        agendarSalvar();
+    } else if (t.dataset.list) {
+        setPropLista(est, t.dataset.list, num(t.dataset.i, -1), t.dataset.p, t.value);
+        agendarSalvar();
+    } else if (t.dataset.r) {
+        rolUI(f.id)[t.dataset.r] = t.value;
+    }
+});
+
+document.addEventListener("change", e => {
+    const t = e.target;
+    const f = fichaAberta();
+
+    if (f && t.dataset) {
+        const est = f.estado;
+        if (t.dataset.stat) {
+            const id = t.dataset.stat;
+            const v = clampAtributo(est, id, t.value);
+            t.value = v;
+            est.campos[id] = String(v);
+            atualizarPontos(f);
+            atualizarRecursosModal(f);
+            atualizarRolInfo(f);
+            agendarSalvar();
+            return;
+        }
+        if (t.dataset.k === "nivel") { t.value = est.campos.nivel; return; }
+        if (t.tagName === "SELECT" && t.dataset.list) {
+            setPropLista(est, t.dataset.list, num(t.dataset.i, -1), t.dataset.p, t.value);
+            if (t.dataset.p === "duracao") atualizarLista("habilidades");
+            agendarSalvar();
+            return;
+        }
+        if (t.tagName === "SELECT" && t.dataset.r) {
+            rolUI(f.id)[t.dataset.r] = t.value;
+            if (t.dataset.r === "pericia" || t.dataset.r === "atributoLivre") atualizarRolInfo(f);
+            return;
+        }
+    }
+
+    const el = t.closest("[data-action]");
+    if (!el) return;
+    const acao = el.dataset.action;
+    const id = el.dataset.id;
+
+    if (acao === "renomear-grupo") {
+        const g = dados.grupos.find(x => x.id === id);
+        if (!g) return;
+        g.nome = el.value.trim() || g.nome;
+        mudou();
+    } else if (acao === "mover") {
+        mover(id, el.value);
+    } else if (acao === "set-vida" || acao === "set-energia") {
+        const alvo = achar(id);
+        if (!alvo) return;
+        setRecurso(alvo, acao === "set-vida" ? "vida" : "energia", el.value);
+        sincronizarRecursos(alvo);
+        agendarSalvar();
+        refrescarRecursos(id);
+    }
+});
+
+/* ---------- Eventos: arrastar e soltar fichas entre grupos ---------- */
+
+document.addEventListener("dragstart", e => {
+    const alca = e.target.closest && e.target.closest("[data-drag]");
+    if (!alca) return;
+    e.dataTransfer.setData("text/plain", alca.dataset.drag);
+    e.dataTransfer.effectAllowed = "move";
+    const card = alca.closest(".card");
+    if (card) {
+        e.dataTransfer.setDragImage(card, 20, 20);
+        card.classList.add("arrastando");
+    }
+});
+
+function limparMarcasDeArraste() {
+    document.querySelectorAll(".grupo.alvo").forEach(el => el.classList.remove("alvo"));
+    document.querySelectorAll(".card.arrastando").forEach(el => el.classList.remove("arrastando"));
+}
+
+document.addEventListener("dragend", limparMarcasDeArraste);
+
+document.addEventListener("dragover", e => {
+    const sec = e.target.closest && e.target.closest(".grupo");
+    if (!sec) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    sec.classList.add("alvo");
+});
+
+document.addEventListener("dragleave", e => {
+    const sec = e.target.closest && e.target.closest(".grupo");
+    if (sec && !sec.contains(e.relatedTarget)) sec.classList.remove("alvo");
+});
+
+document.addEventListener("drop", e => {
+    const sec = e.target.closest && e.target.closest(".grupo");
+    if (!sec) return;
+    e.preventDefault();
+    const id = e.dataTransfer.getData("text/plain");
+    limparMarcasDeArraste();
+    if (id && achar(id)) mover(id, sec.dataset.grupo || null);
+});
+
+/* ---------- Eventos: barra de ações, foto e recorte ---------- */
+
+document.getElementById("btnImportar").addEventListener("click", () => document.getElementById("fileFichas").click());
+document.getElementById("fileFichas").addEventListener("change", e => {
+    const arquivos = [...e.target.files];
+    e.target.value = "";
+    if (arquivos.length) importarArquivos(arquivos);
+});
+document.getElementById("btnInimigo").addEventListener("click", criarFicha);
+document.getElementById("btnGrupo").addEventListener("click", criarGrupo);
+document.getElementById("novoGrupoNome").addEventListener("keydown", e => { if (e.key === "Enter") criarGrupo(); });
+document.getElementById("btnMesaConectar").addEventListener("click", () => mesaConectar(document.getElementById("mesaCodigo").value));
+document.getElementById("mesaCodigo").addEventListener("keydown", e => { if (e.key === "Enter") mesaConectar(e.target.value); });
+document.getElementById("btnMesaSair").addEventListener("click", mesaDesconectar);
+document.getElementById("btnBackup").addEventListener("click", baixarBackup);
+document.getElementById("btnRestaurar").addEventListener("click", () => document.getElementById("fileBackup").click());
+document.getElementById("fileBackup").addEventListener("change", e => {
+    const arquivo = e.target.files[0];
+    e.target.value = "";
+    if (arquivo) restaurarBackup(arquivo);
+});
+
+document.getElementById("fotoInput").addEventListener("change", e => {
+    const arquivo = e.target.files[0];
+    e.target.value = "";
+    if (!arquivo) return;
+    if (!arquivo.type.startsWith("image/")) {
+        msg("Escolha um arquivo de imagem.");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => abrirCrop(ev.target.result);
+    reader.readAsDataURL(arquivo);
+});
+
+const cropArea = document.getElementById("cropArea");
+cropArea.addEventListener("pointerdown", e => {
+    arrastando = { px: e.clientX, py: e.clientY, x: cropState.x, y: cropState.y };
+    cropArea.setPointerCapture(e.pointerId);
+});
+cropArea.addEventListener("pointermove", e => {
+    if (!arrastando) return;
+    cropState.x = arrastando.x + (e.clientX - arrastando.px);
+    cropState.y = arrastando.y + (e.clientY - arrastando.py);
+    aplicarCrop();
+});
+["pointerup", "pointercancel"].forEach(ev => cropArea.addEventListener(ev, () => { arrastando = null; }));
+
+document.getElementById("cropZoom").addEventListener("input", e => {
+    const novoZoom = parseFloat(e.target.value);
+    const sAntigo = cropState.base * cropState.zoom;
+    const cx = (CROP_SIZE / 2 - cropState.x) / sAntigo;
+    const cy = (CROP_SIZE / 2 - cropState.y) / sAntigo;
+    cropState.zoom = novoZoom;
+    const sNovo = cropState.base * novoZoom;
+    cropState.x = CROP_SIZE / 2 - cx * sNovo;
+    cropState.y = CROP_SIZE / 2 - cy * sNovo;
+    aplicarCrop();
+});
+document.getElementById("cropConfirmar").addEventListener("click", confirmarCrop);
+document.getElementById("cropCancelar").addEventListener("click", fecharCrop);
+
+document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (!document.getElementById("cropModal").hidden) fecharCrop();
+    else if (!document.getElementById("fichaModal").hidden) fecharFicha();
+});
+
+/* ---------- Início ---------- */
+
+async function iniciar() {
+    try {
+        const salvo = await armazenamento.get(STORAGE_KEY);
+        if (salvo) {
+            dados = normalizar(JSON.parse(salvo));
+            marcarStatus("painel carregado", true);
+        }
+    } catch (err) {
+        // nada salvo ainda
+    } finally {
+        pronto = true;
+        render();
+    }
+    try {
+        const mesa = await armazenamento.get(MESA_KEY);
+        if (mesa) {
+            document.getElementById("mesaCodigo").value = mesa;
+            mesaConectar(mesa);
+        }
+    } catch (err) {
+        // sem mesa salva
+    }
+}
+
+iniciar();
+</script>
+
+</body>
+</html>
