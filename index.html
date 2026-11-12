@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRACTURE — Ficha de Personagem</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg: #0a0a0f;
+    --bg-vignette: radial-gradient(ellipse at top, #14121a 0%, #0a0a0f 55%);
+    --surface: #131019;
+    --surface-2: #1a1622;
+    --line: #2a2534;
+    --crack: #ff3b4e;
+    --crack-dim: #ff3b4e2e;
+    --crack-glow: #ff3b4e66;
+    --cyan: #33d9ff;
+    --cyan-dim: #33d9ff2e;
+    --violet: #a97bfa;
+    --text: #ece9f2;
+    --text-dim: #948fa3;
+    --text-faint: #5c5769;
+    --radius-cut: 14px;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-vignette);
+    background-color: var(--bg);
+    color: var(--text);
+    padding: 28px 20px 80px;
+    margin: 0;
+    max-width: none;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.masthead{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 6px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    margin: 0;
+    text-transform: uppercase;
+}
+h1 span{ color: var(--crack); }
+
+.status-salvo{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+.status-salvo .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.status-salvo.ativo{ color: var(--cyan); }
+.status-salvo.ativo .dot{ background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+/* ---------- Divisor "fratura" ---------- */
+
+.fracture-line{
+    height: 10px;
+    margin: 22px 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath d='M0 5 L8 2 L14 8 L20 1 L26 7 L32 3 L40 5' stroke='%232a2534' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: 0.9;
+}
+
+/* ---------- Painéis ---------- */
+
+.box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+    position: relative;
+}
+.box::before{
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 22px; height: 1px;
+    background: var(--crack);
+    transform: translate(1px,0) rotate(45deg);
+    transform-origin: top left;
+    opacity: 0.85;
+}
+
+.box h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.box h2::before{
+    content: "";
+    width: 3px; height: 14px;
+    background: var(--crack);
+    display: inline-block;
+}
+.box h3{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 16px 0 6px 0;
+}
+.box h3:first-of-type{ margin-top: 4px; }
+
+/* ---------- Campos ---------- */
+
+.field{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 140px;
+}
+.field label{
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input::placeholder, textarea::placeholder{ color: var(--text-faint); }
+input:focus, textarea:focus{
+    outline: none;
+    border-color: var(--crack);
+    box-shadow: 0 0 0 3px var(--crack-dim);
+}
+textarea{ resize: vertical; font-size: 13px; line-height: 1.5; }
+
+input[type=number] {
+    width: 64px;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+}
+
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- Status (atributos) ---------- */
+
+.pontos-restantes{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border-left: 2px solid var(--line);
+}
+.pontos-restantes b{ color: var(--cyan); font-size: 14px; }
+.pontos-restantes.aviso{ border-left-color: var(--crack); }
+.pontos-restantes.aviso b{ color: var(--crack); }
+.pontos-restantes .aviso-texto{
+    display: none;
+    color: var(--crack);
+    margin-left: 6px;
+}
+.pontos-restantes.aviso .aviso-texto{ display: inline; }
+
+.status-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+}
+@media (max-width: 480px){ .status-grid{ grid-template-columns: 1fr; } }
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+}
+.status-row span{
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.status-row input{ border: none; background: transparent; padding: 0; width: 40px; }
+.status-row input:focus{ box-shadow: none; color: var(--cyan); }
+
+/* ---------- Recursos (vida/energia) ---------- */
+
+.resource {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.resource input{
+    width: 64px;
+    font-size: 15px;
+    color: var(--text);
+}
+.resource .max{ font-size: 15px; color: var(--text-dim); }
+.small { font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
+
+.bar {
+    background: var(--surface-2);
+    height: 14px;
+    width: 100%;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    border: 1px solid var(--line);
+}
+.bar:last-child{ margin-bottom: 0; }
+
+.fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--crack), #ff7a7a);
+    width: 0%;
+    transition: width 0.25s ease;
+    box-shadow: 0 0 10px var(--crack-glow);
+}
+.energy { background: linear-gradient(90deg, var(--cyan), #7ff0ff); box-shadow: 0 0 10px var(--cyan-dim); }
+
+/* ---------- Perícias ---------- */
+
+.pericias-tabela {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.linha {
+    display: grid;
+    grid-template-columns: 1fr 0.35fr 0.35fr 0.35fr;
+    align-items: center;
+    text-align: center;
+    padding: 6px 4px;
+    border-radius: 4px;
+}
+.linha:not(.header):hover{ background: var(--surface-2); }
+
+.linha div:first-child {
+    text-align: left;
+    font-size: 13px;
+}
+.linha div:first-child .small{ margin-left: 4px; }
+
+.linha input[type=radio]{
+    width: 15px; height: 15px;
+    accent-color: var(--crack);
+    margin: 0 auto;
+    cursor: pointer;
+}
+.linha input[type=radio]:disabled{ opacity: 0.25; cursor: not-allowed; }
+
+.header {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+/* ---------- Botões ---------- */
+
+button {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--crack);
+    color: var(--crack);
+    padding: 9px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+button:hover{ background: var(--crack); color: #0a0a0f; }
+
+.botoes{ display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+[hidden]{ display: none !important; }
+.arquivo-nota{ font-size: 11px; color: var(--text-faint); margin-top: 10px; line-height: 1.5; }
+
+/* ---------- Cards de item (inventário / arma) ---------- */
+
+.item-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+@media (max-width: 520px){ .item-grid{ grid-template-columns: 1fr; } }
+
+.item-card{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.item-card input{ background: var(--surface); font-weight: 600; }
+.item-card textarea{ background: var(--surface); min-height: 50px; }
+
+/* ---------- Listas dinâmicas (poderes / habilidades) ---------- */
+
+.lista-dinamica{ display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.lista-dinamica:empty{ margin-bottom: 0; }
+
+.card-dinamico{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.card-dinamico .linha-topo{
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.card-dinamico .linha-topo input{ flex: 1; font-weight: 600; background: var(--surface); }
+.card-dinamico textarea{ background: var(--surface); }
+
+.botao-remover{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text-faint);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    line-height: 1;
+    font-size: 16px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.botao-remover:hover{ background: var(--crack); border-color: var(--crack); color: #0a0a0f; }
+
+.botao-add{
+    border-style: dashed;
+    margin-bottom: 10px;
+}
+
+select{
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+select:focus{ outline: none; border-color: var(--crack); box-shadow: 0 0 0 3px var(--crack-dim); }
+
+.campos-habilidade{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+@media (max-width: 520px){ .campos-habilidade{ grid-template-columns: 1fr; } }
+
+.energia-campo input{ max-width: 120px; background: var(--surface); }
+
+.botao-ngc{
+    align-self: flex-start;
+    border-color: var(--violet);
+    color: var(--violet);
+    font-size: 11px;
+    padding: 6px 12px;
+}
+.botao-ngc:hover{ background: var(--violet); color: #0a0a0f; }
+
+.ngc-secao{
+    border-left: 2px solid var(--violet);
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ngc-secao .ngc-titulo{
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--violet);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ---------- Rolagem ---------- */
+
+.historico-item .linha-topo{ justify-content: space-between; align-items: center; }
+.historico-item strong{ font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.03em; }
+
+.grau-badge{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+.grau-sucesso{ background: var(--cyan-dim); color: var(--cyan); }
+.grau-parcial{ background: #ffb33b2e; color: #ffb33b; }
+.grau-falha{ background: var(--crack-dim); color: var(--crack); }
+
+/* ---------- Foto do personagem ---------- */
+
+[hidden]{ display: none !important; }
+
+.info-layout{
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.info-campos{ flex: 1 1 280px; }
+
+.foto-wrap{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.foto{
+    width: 132px;
+    height: 132px;
+    border: 1px dashed var(--text-faint);
+    background: var(--surface-2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    color: var(--text-faint);
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.foto:hover, .foto:focus{ border-color: var(--crack); color: var(--crack); outline: none; }
+.foto img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto-remover{ font-size: 10px; padding: 4px 10px; border-color: var(--line); color: var(--text-faint); }
+
+/* ---------- Modal de recorte ---------- */
+
+.modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 8, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 100;
+}
+.modal-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    max-width: 100%;
+}
+.modal-card h2{
+    margin: 0;
+    align-self: flex-start;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+.crop-area{
+    width: 280px;
+    height: 280px;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--crack);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+.crop-area:active{ cursor: grabbing; }
+.crop-area img{
+    position: absolute;
+    max-width: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+.crop-zoom{ width: 280px; max-width: 100%; }
+.crop-zoom input{ padding: 0; accent-color: var(--crack); }
+.crop-dica{ font-size: 11px; color: var(--text-faint); margin: 0; text-align: center; }
+
+/* ---------- Intro ---------- */
+
+#intro{ position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+#intro.saindo{ pointer-events: none; }
+.intro-metade{
+    position: absolute; inset: 0;
+    background-color: var(--bg);
+    background-image: var(--bg-vignette);
+    transition: transform 0.95s cubic-bezier(0.76, 0, 0.2, 1);
+    will-change: transform;
+}
+.intro-esq{ clip-path: polygon(0 0, 52% 0, 47% 18%, 54% 35%, 46% 52%, 53% 70%, 48% 86%, 51% 100%, 0 100%); }
+.intro-dir{ clip-path: polygon(52% 0, 100% 0, 100% 100%, 51% 100%, 48% 86%, 53% 70%, 46% 52%, 54% 35%, 47% 18%); }
+#intro.saindo .intro-esq{ transform: translateX(-102%); }
+#intro.saindo .intro-dir{ transform: translateX(102%); }
+
+.intro-rachadura-wrap{
+    position: absolute; inset: 0; pointer-events: none;
+    filter: drop-shadow(0 0 6px var(--crack-glow)) drop-shadow(0 0 20px var(--crack-glow));
+    transition: opacity 0.3s ease;
+}
+.intro-rachadura{ width: 100%; height: 100%; display: block; animation: introRachar 1.05s cubic-bezier(0.5, 0, 0.3, 1) 0.1s both; }
+.intro-rachadura polyline{ fill: none; stroke: var(--crack); stroke-width: 2.4; vector-effect: non-scaling-stroke; stroke-linejoin: miter; }
+@keyframes introRachar{ from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+
+.intro-flash{
+    position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: radial-gradient(circle at 50% 50%, var(--crack-glow), transparent 55%);
+    animation: introFlash 0.55s ease-out 0.8s both;
+}
+@keyframes introFlash{ 0% { opacity: 0; } 25% { opacity: 0.9; } 100% { opacity: 0; } }
+
+.intro-titulo{
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px;
+    pointer-events: none; text-align: center; padding: 0 16px;
+    transition: opacity 0.3s ease;
+}
+.intro-nome{
+    font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase;
+    font-size: clamp(40px, 11vw, 104px); color: var(--crack);
+    animation: introTitulo 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) 0.55s both, introGlitch 0.4s steps(2, end) 1.45s both;
+}
+@keyframes introTitulo{
+    from { opacity: 0; letter-spacing: 0.7em; filter: blur(10px); }
+    to { opacity: 1; letter-spacing: 0.16em; filter: blur(0); }
+}
+@keyframes introGlitch{
+    0%, 100% { text-shadow: none; transform: none; }
+    25% { text-shadow: -4px 0 var(--cyan), 4px 0 var(--crack); transform: translateX(3px); }
+    50% { text-shadow: 4px 0 var(--cyan), -4px 0 var(--crack); transform: translateX(-3px); }
+    75% { text-shadow: -2px 0 var(--cyan), 2px 0 var(--crack); transform: translateX(1px); }
+}
+.intro-sub{
+    font-family: 'JetBrains Mono', monospace; font-size: clamp(10px, 2.4vw, 14px);
+    letter-spacing: 0.5em; color: var(--text-dim);
+    animation: introSub 0.7s ease-out 1.0s both;
+}
+@keyframes introSub{ from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.intro-pular{
+    position: absolute; bottom: 22px; left: 0; right: 0; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint); animation: introSub 0.6s ease-out 1.2s both;
+}
+#intro.saindo .intro-titulo, #intro.saindo .intro-rachadura-wrap{ opacity: 0; }
+#intro.saindo .intro-flash, #intro.saindo .intro-pular{ display: none; }
+
+/* ---------- Painel: barra superior, menu lateral e abas ---------- */
+
+.layout{
+    display: grid; gap: 18px 22px; align-items: start;
+    max-width: 1760px; margin: 0 auto;
+    grid-template-columns: 210px minmax(0, 1fr) 340px;
+    grid-template-areas: "topo topo topo" "menu main r";
+}
+.layout.sem-lateral{ grid-template-columns: 210px minmax(0, 1fr); grid-template-areas: "topo topo" "menu main"; }
+.layout.sem-lateral .coluna-lateral{ display: none; }
+
+.barra-topo{
+    grid-area: topo; position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 22px;
+    padding: 10px 18px;
+    background: rgba(10, 10, 15, 0.92); backdrop-filter: blur(10px);
+    border: 1px solid var(--line); border-bottom: 2px solid var(--crack);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+.topo-marca h1{ margin: 0; font-size: 24px; line-height: 1; }
+.topo-marca small{ display: block; margin-top: 3px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.3em; color: var(--text-faint); }
+.topo-personagem{ display: flex; align-items: center; gap: 10px; min-width: 0; }
+.topo-foto{
+    width: 42px; height: 42px; flex-shrink: 0; background: #000 center / cover no-repeat; border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--text-faint);
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.topo-info{ min-width: 0; }
+.topo-info strong{ display: block; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.topo-info span{ font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); }
+.topo-hud{ display: flex; gap: 18px; margin-left: auto; }
+.hud{ display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text-dim); }
+.hud-barra{ width: 120px; height: 8px; background: var(--surface-2, #1a1622); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
+.hud-barra i{ display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--crack), #ff7a7a); transition: width 0.25s ease; }
+.hud.energia .hud-barra i{ background: linear-gradient(90deg, var(--cyan), #7ff0ff); }
+.hud b{ min-width: 54px; text-align: right; color: var(--text); font-weight: 600; }
+
+.menu{
+    grid-area: menu; position: sticky; top: 92px; align-self: start;
+    display: flex; flex-direction: column; gap: 4px; padding: 10px;
+    background: var(--surface); border: 1px solid var(--line);
+    clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+.menu-item{
+    position: relative; display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 11px 12px; text-align: left;
+    background: transparent; border: 1px solid transparent; border-left: 3px solid transparent; border-radius: 4px;
+    color: var(--text-dim); letter-spacing: 0.08em;
+}
+.menu-item svg{ width: 22px; height: 22px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.menu-texto{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.menu-rotulo{ font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 14px; text-transform: uppercase; }
+.menu-desc{ font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: none; color: var(--text-faint); }
+.menu-item:hover{ background: rgba(255, 255, 255, 0.04); color: var(--text); }
+.menu-item.ativo{ background: var(--crack-dim); border-left-color: var(--crack); color: var(--text); }
+.menu-item.ativo svg{ color: var(--crack); }
+.menu-badge{ margin-left: auto; min-width: 20px; padding: 1px 7px; border-radius: 10px; background: var(--crack); color: #0a0a0f; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 10px; text-align: center; }
+.menu-badge:empty{ display: none; }
+.menu-badge.alerta{ background: #ffb33b; }
+
+.conteudo{ grid-area: main; min-width: 0; container-type: inline-size; }
+.aba:not([hidden]){ animation: abaEntra 0.28s ease both; }
+@keyframes abaEntra{ from{ opacity: 0; transform: translateY(8px); } to{ opacity: 1; transform: none; } }
+.grade-2{ display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; margin-bottom: 16px; }
+.grade-2 > .box{ margin-bottom: 0; }
+.grade-2.assim-pericias{ grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+.grade-2.assim-poderes{ grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); }
+.box.fixo{ position: sticky; top: 92px; }
+@container (max-width: 760px){
+    .grade-2, .grade-2.assim-pericias, .grade-2.assim-poderes{ grid-template-columns: minmax(0, 1fr); }
+    .box.fixo{ position: static; }
+}
+
+.coluna-lateral{ grid-area: r; position: sticky; top: 92px; align-self: start; max-height: calc(100vh - 108px); overflow-y: auto; scrollbar-width: none; }
+.coluna-lateral::-webkit-scrollbar{ display: none; }
+.coluna-lateral.entregando{ animation: ranqEntrega 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes ranqEntrega{
+    0%{ opacity: 0; transform: translateX(70px); filter: blur(8px); }
+    35%{ opacity: 0.9; transform: translateX(-6px); filter: blur(0); }
+    48%{ opacity: 0.3; }
+    60%{ opacity: 1; }
+    70%{ opacity: 0.55; }
+    100%{ opacity: 1; transform: none; }
+}
+
+.ranqueador{
+    position: relative;
+    overflow: hidden;
+    padding: 14px 12px 12px;
+    border: 1px solid #2c2433;
+    background:
+        linear-gradient(180deg, rgba(255, 43, 43, 0.09), rgba(0, 0, 0, 0) 26%),
+        linear-gradient(rgba(255, 255, 255, 0.024) 1px, transparent 1px) 0 0 / 22px 22px,
+        linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px) 0 0 / 22px 22px,
+        #0b0910;
+    clip-path: polygon(0 16px, 16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px));
+}
+.ranqueador::after{
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(255, 43, 43, 0.09), transparent) no-repeat;
+    background-size: 100% 26%;
+    background-position: 0 -30%;
+    animation: ranqVarre 6s linear infinite;
+}
+@keyframes ranqVarre{ to{ background-position: 0 130%; } }
+
+.ranq-canto{ position: absolute; width: 12px; height: 12px; border: 2px solid var(--crack); opacity: 0.85; pointer-events: none; }
+.ranq-canto.tl{ top: 9px; left: 9px; border-right: none; border-bottom: none; }
+.ranq-canto.tr{ top: 9px; right: 9px; border-left: none; border-bottom: none; }
+.ranq-canto.bl{ bottom: 9px; left: 9px; border-right: none; border-top: none; }
+.ranq-canto.br{ bottom: 9px; right: 9px; border-left: none; border-top: none; }
+
+.ranq-cabecalho{ position: relative; display: flex; align-items: center; gap: 10px; padding: 4px 6px 10px; border-bottom: 1px solid var(--line); }
+.ranq-titulos{ flex: 1; min-width: 0; }
+.ranq-titulos small{ display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.28em; color: var(--text-faint); }
+.ranq-titulos strong{
+    display: block; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 24px;
+    letter-spacing: 0.14em; color: var(--text); text-shadow: 0 0 18px var(--crack-glow);
+}
+.ranq-status{
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 9px; letter-spacing: 0.1em;
+    padding: 3px 7px; border: 1px solid rgba(255, 179, 59, 0.45); color: #ffb33b; border-radius: 2px;
+}
+.ranq-status.vivo{ color: var(--crack); border-color: rgba(255, 43, 43, 0.55); animation: ranqPulsa 1.6s ease-in-out infinite; }
+@keyframes ranqPulsa{ 0%, 100%{ opacity: 1; } 50%{ opacity: 0.45; } }
+.ranq-seta{ display: none; color: var(--text-dim); transition: transform 0.2s ease; }
+
+/* drone */
+.ranq-drone{ width: 46px; height: 46px; overflow: visible; flex-shrink: 0; animation: droneFlutua 3.2s ease-in-out infinite; }
+@keyframes droneFlutua{ 0%, 100%{ transform: translateY(0); } 50%{ transform: translateY(-4px); } }
+.ranq-drone .asa{ fill: rgba(255, 43, 43, 0.22); stroke: var(--crack); stroke-width: 1.2; transform-box: fill-box; animation: asaBate 0.16s ease-in-out infinite alternate; }
+.ranq-drone .asa.esq{ transform-origin: 100% 50%; }
+.ranq-drone .asa.dir{ transform-origin: 0% 50%; }
+@keyframes asaBate{ from{ transform: scaleY(1); } to{ transform: scaleY(0.5); } }
+.ranq-drone .corpo{ fill: #15111b; stroke: #3a3346; stroke-width: 1.5; }
+.ranq-drone .anel{ fill: none; stroke: var(--crack); stroke-width: 1; stroke-dasharray: 3 3; transform-box: fill-box; transform-origin: center; animation: anelGira 6s linear infinite; }
+@keyframes anelGira{ to{ transform: rotate(360deg); } }
+.ranq-drone .olho{ fill: var(--crack); filter: drop-shadow(0 0 4px var(--crack)); animation: olhoPulsa 1.8s ease-in-out infinite; }
+@keyframes olhoPulsa{ 0%, 100%{ opacity: 1; } 50%{ opacity: 0.5; } }
+.ranq-drone .antena{ stroke: #3a3346; stroke-width: 1.5; fill: none; }
+.ranq-drone .antena-ponta{ fill: var(--crack); }
+.ranq-drone .fenda{ stroke: var(--crack); stroke-width: 1.4; opacity: 0.7; }
+
+.ranq-subtitulo{ display: flex; justify-content: space-between; margin: 10px 4px 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 10px; letter-spacing: 0.2em; color: var(--crack); }
+.ranq-subtitulo span:last-child{ color: var(--text-dim); }
+
+.elite-lista{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.elite-item{
+    --cor: var(--text-faint);
+    position: relative;
+    display: grid; grid-template-columns: 34px 40px 1fr; align-items: center; gap: 10px;
+    padding: 5px 10px 5px 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    border: 1px solid var(--line); border-left: 3px solid var(--cor); border-radius: 3px;
+}
+.ranqueador.entrando .elite-item{ opacity: 0; transform: translateX(14px); animation: eliteEntra 0.45s ease forwards; animation-delay: calc(var(--i) * 70ms); }
+@keyframes eliteEntra{ to{ opacity: 1; transform: none; } }
+.elite-item.mudou{ animation: eliteMudou 1.6s ease-out; }
+@keyframes eliteMudou{ 0%{ background: rgba(255, 43, 43, 0.38); box-shadow: 0 0 18px var(--crack-glow); } 100%{ box-shadow: none; } }
+
+.elite-rank{ font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; color: var(--cor); text-align: center; }
+.elite-foto{
+    width: 40px; height: 40px; object-fit: cover; display: block; background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.elite-nome{
+    font-family: 'Oswald', sans-serif; font-weight: 500; font-size: 15px; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.elite-delta{
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 10px;
+    padding: 2px 6px; border-radius: 2px; background: #0b0910; opacity: 0;
+    animation: deltaMostra 9s ease forwards;
+}
+.elite-delta.sobe{ color: #5be3a0; border: 1px solid rgba(91, 227, 160, 0.5); }
+.elite-delta.desce{ color: var(--crack); border: 1px solid rgba(255, 43, 43, 0.5); }
+.elite-delta.novo{ color: #ffcb47; border: 1px solid rgba(255, 203, 71, 0.5); }
+@keyframes deltaMostra{ 0%{ opacity: 0; } 6%{ opacity: 1; } 85%{ opacity: 1; } 100%{ opacity: 0; } }
+
+.elite-item.top1{ --cor: #ffcb47; grid-template-columns: 34px 48px 1fr; padding-top: 7px; padding-bottom: 7px; background: linear-gradient(90deg, rgba(255, 203, 71, 0.17), rgba(255, 203, 71, 0.02)); box-shadow: 0 0 22px rgba(255, 203, 71, 0.12); }
+.elite-item.top2{ --cor: #c9d3e0; grid-template-columns: 34px 44px 1fr; background: linear-gradient(90deg, rgba(201, 211, 224, 0.1), rgba(201, 211, 224, 0.015)); }
+.elite-item.top3{ --cor: #d9894a; grid-template-columns: 34px 44px 1fr; background: linear-gradient(90deg, rgba(217, 137, 74, 0.12), rgba(217, 137, 74, 0.015)); }
+.elite-item.top1 .elite-foto{ width: 48px; height: 48px; border-color: rgba(255, 203, 71, 0.55); }
+.elite-item.top2 .elite-foto, .elite-item.top3 .elite-foto{ width: 44px; height: 44px; }
+.elite-item.top1 .elite-nome{ font-size: 18px; color: #ffe9b0; }
+.elite-item.top1 .elite-rank{ text-shadow: 0 0 12px rgba(255, 203, 71, 0.7); }
+.elite-item.vazio .elite-nome{ color: var(--text-faint); letter-spacing: 0.3em; }
+.elite-item.vazio .elite-foto{ opacity: 0.55; }
+
+.ranq-rodape{ display: flex; justify-content: space-between; margin: 12px 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--text-faint); }
+.ranq-rodape b{ color: var(--text-dim); }
+.ranq-previa{ margin-top: 12px; padding: 8px; border: 1px dashed var(--line); border-radius: 3px; text-align: center; }
+.ranq-previa small{ display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: var(--text-faint); margin-bottom: 6px; }
+.ranq-previa button{ font-size: 10px; padding: 5px 8px; margin: 0 3px; border-color: var(--line); color: var(--text-dim); }
+.ranq-previa button:hover{ background: var(--surface-2, #1c1a24); color: var(--text); }
+
+.ranq-aviso{
+    position: fixed; right: 18px; top: 18px; z-index: 200;
+    padding: 10px 16px 10px 14px; background: #0b0910; border: 1px solid var(--crack); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; line-height: 1.5;
+    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+    animation: avisoEntra 0.4s ease both, avisoSai 0.4s ease 3.6s forwards;
+}
+.ranq-aviso b{ color: var(--crack); }
+@keyframes avisoEntra{ from{ opacity: 0; transform: translateX(30px); } to{ opacity: 1; transform: none; } }
+@keyframes avisoSai{ to{ opacity: 0; transform: translateX(30px); } }
+
+@media (max-width: 1199px){
+    .layout{ grid-template-columns: 200px minmax(0, 1fr); grid-template-areas: "topo topo" "menu r" "menu main"; }
+    .layout.sem-lateral{ grid-template-columns: 200px minmax(0, 1fr); grid-template-areas: "topo topo" "menu main"; }
+    .coluna-lateral{ position: static; max-height: none; overflow: visible; }
+    .ranq-cabecalho{ cursor: pointer; }
+    .ranq-seta{ display: block; }
+    .ranqueador.colapsado .ranq-corpo{ display: none; }
+    .ranqueador.colapsado .ranq-seta{ transform: rotate(-90deg); }
+}
+@media (max-width: 800px){
+    .layout{ grid-template-columns: minmax(0, 1fr); grid-template-areas: "topo" "r" "main"; padding-bottom: 78px; }
+    .layout.sem-lateral{ grid-template-columns: minmax(0, 1fr); grid-template-areas: "topo" "main"; }
+    .barra-topo{ gap: 12px; padding: 8px 12px; }
+    .topo-marca small, .status-salvo, .hud span{ display: none; }
+    .topo-info strong{ max-width: 120px; font-size: 14px; }
+    .hud-barra{ width: 52px; }
+    .hud b{ min-width: 44px; font-size: 9px; }
+    .topo-hud{ gap: 10px; }
+    .menu{
+        position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 60;
+        flex-direction: row; gap: 2px; padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        border-width: 1px 0 0 0; clip-path: none; background: rgba(11, 9, 16, 0.97); backdrop-filter: blur(10px);
+    }
+    .menu-item{ flex: 1; flex-direction: column; gap: 3px; padding: 6px 2px; justify-content: center; text-align: center; border-left-width: 1px; letter-spacing: 0.03em; }
+    .menu-desc{ display: none; }
+    .menu-rotulo{ font-size: 9px; }
+    .menu-item svg{ width: 22px; height: 22px; }
+    .menu-badge{ position: absolute; top: 1px; right: 8%; margin: 0; padding: 0 5px; min-width: 16px; }
+    .menu-item.ativo{ border-left-color: transparent; border-top: 2px solid var(--crack); }
+}
+@media (prefers-reduced-motion: reduce){
+    .ranqueador.entrando .elite-item{ opacity: 1; transform: none; animation: none; }
+    .ranqueador::after, .ranq-drone, .ranq-drone *{ animation: none !important; }
+}
+</style>
+
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+<div class="intro-metade intro-esq"></div>
+<div class="intro-metade intro-dir"></div>
+<div class="intro-rachadura-wrap">
+<svg class="intro-rachadura" viewBox="0 0 100 100" preserveAspectRatio="none">
+<polyline points="52,0 47,18 54,35 46,52 53,70 48,86 51,100"/>
+<polyline points="47,18 38,24 33,33 26,36"/>
+<polyline points="54,35 63,41 68,52 76,55"/>
+<polyline points="46,52 37,60 35,71"/>
+<polyline points="53,70 62,76 66,86"/>
+</svg>
+</div>
+<div class="intro-flash"></div>
+<div class="intro-titulo"><span class="intro-nome">FRACTURE</span><span class="intro-sub">FICHA DE PERSONAGEM</span></div>
+<div class="intro-pular">clique para pular</div>
+</div>
+<script>
+(function () {
+    var intro = document.getElementById("intro");
+    if (!intro) return;
+    var pular = false;
+    try {
+        pular = window.matchMedia("(prefers-reduced-motion: reduce)").matches || sessionStorage.getItem("fracture-intro-ficha") === "1";
+    } catch (e) {}
+    if (pular) { intro.remove(); return; }
+    try { sessionStorage.setItem("fracture-intro-ficha", "1"); } catch (e) {}
+    var saindo = false, t1;
+    function sair() {
+        if (saindo) return;
+        saindo = true;
+        clearTimeout(t1);
+        intro.classList.add("saindo");
+        setTimeout(function () { intro.remove(); }, 1050);
+    }
+    t1 = setTimeout(sair, 2100);
+    intro.addEventListener("click", sair);
+    document.addEventListener("keydown", sair, { once: true });
+})();
+</script>
+
+
+<div class="layout" id="layout">
+<header class="barra-topo">
+<div class="topo-marca"><h1><span>FRACTURE</span></h1><small>FICHA DE PERSONAGEM</small></div>
+<div class="topo-personagem">
+<div class="topo-foto" id="topoFoto">?</div>
+<div class="topo-info"><strong id="topoNome">Sem nome</strong><span id="topoSub">Lv 1</span></div>
+</div>
+<div class="topo-hud">
+<div class="hud"><span>VIDA</span><div class="hud-barra"><i id="topoVidaBar"></i></div><b id="topoVidaTxt">0/0</b></div>
+<div class="hud energia"><span>ENERGIA</span><div class="hud-barra"><i id="topoEnergiaBar"></i></div><b id="topoEnergiaTxt">0/0</b></div>
+</div>
+<div class="status-salvo" id="statusSalvo"><span class="dot"></span><span id="statusSalvoTexto">ainda não salvo</span></div>
+</header>
+
+<nav class="menu" id="menuPrincipal" aria-label="Seções da ficha">
+<button type="button" class="menu-item ativo" data-aba="personagem"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg><span class="menu-texto"><span class="menu-rotulo">Personagem</span><span class="menu-desc">info, status e recursos</span></span><span class="menu-badge" id="badgePersonagem"></span></button>
+<button type="button" class="menu-item" data-aba="pericias"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="9" r="1.2"/><circle cx="9" cy="15" r="1.2"/><circle cx="15" cy="15" r="1.2"/></svg><span class="menu-texto"><span class="menu-rotulo">Perícias</span><span class="menu-desc">perícias e rolagem</span></span><span class="menu-badge" id="badgePericias"></span></button>
+<button type="button" class="menu-item" data-aba="equipamentos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9a5 5 0 0 1 10 0v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><path d="M9 14h6M10 9V6.5a2 2 0 0 1 4 0V9"/></svg><span class="menu-texto"><span class="menu-rotulo">Equipamentos</span><span class="menu-desc">inventário e arma</span></span></button>
+<button type="button" class="menu-item" data-aba="poderes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 14h6l-1 8 8-12h-6z"/></svg><span class="menu-texto"><span class="menu-rotulo">Poderes</span><span class="menu-desc">poderes e habilidades</span></span></button>
+<button type="button" class="menu-item" data-aba="historia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 4v13"/></svg><span class="menu-texto"><span class="menu-rotulo">História</span><span class="menu-desc">aparência e objetivos</span></span></button>
+<button type="button" class="menu-item" data-aba="config"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/><circle cx="9" cy="7" r="2" fill="currentColor"/><circle cx="15" cy="12" r="2" fill="currentColor"/><circle cx="8" cy="17" r="2" fill="currentColor"/></svg><span class="menu-texto"><span class="menu-rotulo">Config.</span><span class="menu-desc">mesa online e arquivo</span></span></button>
+</nav>
+
+<main class="conteudo" id="conteudo">
+
+<section class="aba" data-aba="personagem">
+<div class="box">
+<h2>Informações</h2>
+<div class="info-layout">
+<div class="foto-wrap">
+<div class="foto" id="fotoBox" role="button" tabindex="0" title="Escolher foto do personagem">
+<img id="fotoImg" alt="Foto do personagem" hidden>
+<span id="fotoPlaceholder">+ Foto</span>
+</div>
+<button type="button" class="foto-remover" id="fotoRemover" hidden>remover foto</button>
+<input type="file" id="fotoInput" accept="image/*" style="display:none">
+</div>
+<div class="row info-campos">
+<div class="field"><label>Nome</label><input data-key="nome" placeholder="Nome"></div>
+<div class="field"><label>Apelido</label><input data-key="apelido" placeholder="Apelido"></div>
+<div class="field" style="flex: 0 1 90px;"><label>Level</label><input id="nivel" data-key="nivel" type="number" value="1" min="1"></div>
+<div class="field"><label>Bounty</label><input id="bounty" data-key="bounty" inputmode="numeric" placeholder="0"></div>
+<div class="field"><label>Universo</label><input data-key="universo" placeholder="Universo"></div>
+</div>
+</div>
+</div>
+<div class="grade-2">
+<div class="box">
+<h2>Status</h2>
+<div class="pontos-restantes" id="pontosBox">Pontos restantes: <b id="pontos">12</b><span class="aviso-texto">— reduza um atributo</span></div>
+
+<div class="status-grid">
+<div class="status-row"><span>Físico</span><input id="fis" data-key="fis" type="number" min="1" value="1"></div>
+<div class="status-row"><span>Mental</span><input id="men" data-key="men" type="number" min="1" value="1"></div>
+<div class="status-row"><span>Constituição</span><input id="con" data-key="con" type="number" min="1" value="1"></div>
+<div class="status-row"><span>Agilidade</span><input id="agi" data-key="agi" type="number" min="1" value="1"></div>
+<div class="status-row"><span>Presença</span><input id="pre" data-key="pre" type="number" min="1" value="1"></div>
+<div class="status-row"><span>Vontade</span><input id="von" data-key="von" type="number" min="1" value="1"></div>
+</div>
+</div>
+<div class="box">
+<h2>Recursos</h2>
+
+<div class="resource">
+Vida:
+<input id="vidaAtual" data-key="vidaAtual" type="number" min="0" value="">
+/
+<span class="max" id="vidaMax">0</span>
+<span class="small" id="calcVida"></span>
+</div>
+<div class="bar"><div id="vidaBar" class="fill"></div></div>
+
+<div class="resource">
+Energia:
+<input id="energiaAtual" data-key="energiaAtual" type="number" min="0" value="">
+/
+<span class="max" id="energiaMax">0</span>
+<span class="small" id="calcEnergia"></span>
+</div>
+<div class="bar"><div id="energiaBar" class="fill energy"></div></div>
+
+</div>
+</div>
+</section>
+
+<section class="aba" data-aba="pericias" hidden>
+<div class="grade-2 assim-pericias">
+<div class="box">
+<h2>Perícias</h2>
+<div class="pontos-restantes" id="periciasBox">Perícias restantes: <b id="periciasRestantes">4</b><span class="aviso-texto">— acima do limite do level</span></div>
+
+<div class="pericias-tabela">
+
+<div class="linha header">
+<div>Perícia</div>
+<div>Treinado</div>
+<div>Especializado</div>
+<div>Mestre</div>
+</div>
+
+<div class="linha"><div>Luta <span class="small">(Físico)</span></div><input type="radio" name="luta"><input type="radio" name="luta"><input type="radio" name="luta"></div>
+
+<div class="linha"><div>Diplomacia <span class="small">(Presença)</span></div><input type="radio" name="diplomacia"><input type="radio" name="diplomacia"><input type="radio" name="diplomacia"></div>
+<div class="linha"><div>Persuasão <span class="small">(Presença)</span></div><input type="radio" name="persuasao"><input type="radio" name="persuasao"><input type="radio" name="persuasao"></div>
+<div class="linha"><div>Enganação <span class="small">(Presença)</span></div><input type="radio" name="enganacao"><input type="radio" name="enganacao"><input type="radio" name="enganacao"></div>
+<div class="linha"><div>Sedução <span class="small">(Presença)</span></div><input type="radio" name="seducao"><input type="radio" name="seducao"><input type="radio" name="seducao"></div>
+
+<div class="linha"><div>Furtividade <span class="small">(Agilidade)</span></div><input type="radio" name="furtividade"><input type="radio" name="furtividade"><input type="radio" name="furtividade"></div>
+<div class="linha"><div>Distração <span class="small">(Presença)</span></div><input type="radio" name="distracao"><input type="radio" name="distracao"><input type="radio" name="distracao"></div>
+<div class="linha"><div>Fuga <span class="small">(Agilidade)</span></div><input type="radio" name="fuga"><input type="radio" name="fuga"><input type="radio" name="fuga"></div>
+
+<div class="linha"><div>Criminalidade <span class="small">(Mental)</span></div><input type="radio" name="criminalidade"><input type="radio" name="criminalidade"><input type="radio" name="criminalidade"></div>
+<div class="linha"><div>Investigação <span class="small">(Mental)</span></div><input type="radio" name="investigacao"><input type="radio" name="investigacao"><input type="radio" name="investigacao"></div>
+<div class="linha"><div>Inteligência <span class="small">(Mental)</span></div><input type="radio" name="inteligencia"><input type="radio" name="inteligencia"><input type="radio" name="inteligencia"></div>
+<div class="linha"><div>Percepção <span class="small">(Mental)</span></div><input type="radio" name="percepcao"><input type="radio" name="percepcao"><input type="radio" name="percepcao"></div>
+
+<div class="linha"><div>Pressentimento <span class="small">(Vontade)</span></div><input type="radio" name="pressentimento"><input type="radio" name="pressentimento"><input type="radio" name="pressentimento"></div>
+<div class="linha"><div>Reflexo <span class="small">(Agilidade)</span></div><input type="radio" name="reflexo"><input type="radio" name="reflexo"><input type="radio" name="reflexo"></div>
+<div class="linha"><div>Pontaria <span class="small">(Físico)</span></div><input type="radio" name="pontaria"><input type="radio" name="pontaria"><input type="radio" name="pontaria"></div>
+<div class="linha"><div>Iniciativa <span class="small">(Agilidade)</span></div><input type="radio" name="iniciativa"><input type="radio" name="iniciativa"><input type="radio" name="iniciativa"></div>
+
+<div class="linha"><div>Controle <span class="small">(Vontade)</span></div><input type="radio" name="controle"><input type="radio" name="controle"><input type="radio" name="controle"></div>
+<div class="linha"><div>Resistência <span class="small">(Constituição)</span></div><input type="radio" name="resistencia"><input type="radio" name="resistencia"><input type="radio" name="resistencia"></div>
+<div class="linha"><div>Determinação <span class="small">(Vontade)</span></div><input type="radio" name="determinacao"><input type="radio" name="determinacao"><input type="radio" name="determinacao"></div>
+<div class="linha"><div>Tranquilidade <span class="small">(Vontade)</span></div><input type="radio" name="tranquilidade"><input type="radio" name="tranquilidade"><input type="radio" name="tranquilidade"></div>
+<div class="linha"><div>Magia <span class="small">(Vontade)</span></div><input type="radio" name="magia"><input type="radio" name="magia"><input type="radio" name="magia"></div>
+
+<div class="linha"><div>Adestramento <span class="small">(Presença)</span></div><input type="radio" name="adestramento"><input type="radio" name="adestramento"><input type="radio" name="adestramento"></div>
+
+</div>
+</div>
+<div class="box fixo">
+<h2>Rolagem</h2>
+
+<h3>Teste de Perícia</h3>
+<div class="row">
+<div class="field"><label>Perícia</label><select id="rolPericia"><option value="">— Rolagem livre —</option></select></div>
+<div class="field" id="rolAtributoLivreCampo" style="display:none; flex: 1 1 140px;">
+<label>Atributo</label>
+<select id="rolAtributoLivre">
+<option value="fis">Físico</option>
+<option value="men">Mental</option>
+<option value="con">Constituição</option>
+<option value="agi">Agilidade</option>
+<option value="pre">Presença</option>
+<option value="von">Vontade</option>
+</select>
+</div>
+<div class="field" style="flex: 0 1 100px;"><label>Modificador</label><input id="rolModPericia" type="number" value="0"></div>
+<div class="field" style="flex: 0 1 110px;"><label>Dificuldade</label><input id="rolDificuldade" type="number" placeholder="opcional"></div>
+</div>
+<div class="small" id="rolPericiaInfo" style="margin-top: 6px;"></div>
+<button type="button" id="rolarPericiaBtn" style="margin-top: 10px;">🎲 Rolar teste</button>
+
+<h3>Outros Dados</h3>
+<div class="row">
+<div class="field"><label>Rótulo</label><input id="rolRotulo" placeholder="ex: Dano — Espada Longa"></div>
+<div class="field" style="flex: 0 1 90px;"><label>Dado</label>
+<select id="rolDado">
+<option value="4">d4</option>
+<option value="6">d6</option>
+<option value="8">d8</option>
+<option value="10">d10</option>
+<option value="12">d12</option>
+<option value="20" selected>d20</option>
+<option value="100">d100</option>
+</select>
+</div>
+<div class="field" style="flex: 0 1 80px;"><label>Quantidade</label><input id="rolQtd" type="number" min="1" value="1"></div>
+<div class="field" style="flex: 0 1 100px;"><label>Modificador</label><input id="rolModDados" type="number" value="0"></div>
+</div>
+<button type="button" id="rolarDadosBtn" style="margin-top: 10px;">🎲 Rolar dados</button>
+
+<h3>Histórico</h3>
+<div class="lista-dinamica" id="historicoLista"></div>
+<p class="arquivo-nota" id="historicoVazio">Nenhuma rolagem ainda nesta sessão.</p>
+</div>
+</div>
+</section>
+
+<section class="aba" data-aba="equipamentos" hidden>
+<div class="box">
+<h2>Equipamentos</h2>
+
+<h3>Inventário (6 slots)</h3>
+<div class="item-grid">
+<div class="item-card"><input data-key="inv1-nome" placeholder="Nome do item"><textarea data-key="inv1-desc" rows="2" placeholder="Descrição"></textarea></div>
+<div class="item-card"><input data-key="inv2-nome" placeholder="Nome do item"><textarea data-key="inv2-desc" rows="2" placeholder="Descrição"></textarea></div>
+<div class="item-card"><input data-key="inv3-nome" placeholder="Nome do item"><textarea data-key="inv3-desc" rows="2" placeholder="Descrição"></textarea></div>
+<div class="item-card"><input data-key="inv4-nome" placeholder="Nome do item"><textarea data-key="inv4-desc" rows="2" placeholder="Descrição"></textarea></div>
+<div class="item-card"><input data-key="inv5-nome" placeholder="Nome do item"><textarea data-key="inv5-desc" rows="2" placeholder="Descrição"></textarea></div>
+<div class="item-card"><input data-key="inv6-nome" placeholder="Nome do item"><textarea data-key="inv6-desc" rows="2" placeholder="Descrição"></textarea></div>
+</div>
+
+<h3>Arma Principal</h3>
+<div class="item-card"><input data-key="arma-nome" placeholder="Nome da arma"><textarea data-key="arma-desc" rows="2" placeholder="Descrição"></textarea></div>
+</div>
+</section>
+
+<section class="aba" data-aba="poderes" hidden>
+<div class="grade-2 assim-poderes">
+<div class="box">
+<h2>Poderes</h2>
+<div class="lista-dinamica" id="poderesLista"></div>
+<button type="button" class="botao-add" id="addPoder">+ Adicionar poder</button>
+</div>
+<div class="box">
+<h2>Habilidades</h2>
+<div class="lista-dinamica" id="habilidadesLista"></div>
+<button type="button" class="botao-add" id="addHabilidade">+ Adicionar habilidade</button>
+</div>
+</div>
+</section>
+
+<section class="aba" data-aba="historia" hidden>
+<div class="grade-2">
+<div class="box">
+<h2>Aparência</h2>
+<textarea data-key="aparencia" rows="3"></textarea>
+</div>
+<div class="box">
+<h2>Objetivos / Sonhos</h2>
+<div class="lista-dinamica" id="objetivosLista"></div>
+<button type="button" class="botao-add" id="addObjetivo">+ Adicionar objetivo</button>
+</div>
+</div>
+<div class="box">
+<h2>História</h2>
+<textarea data-key="historia" rows="4"></textarea>
+</div>
+</section>
+
+<section class="aba" data-aba="config" hidden>
+<div class="grade-2">
+<div class="box">
+<h2>Mesa online</h2>
+<div class="row" style="align-items: flex-end;">
+<div class="field" style="flex: 1 1 220px;"><label>Código da mesa</label><input id="mesaCodigo" placeholder="código que o mestre passou"></div>
+<div class="botoes">
+<button type="button" id="btnMesaConectar">Conectar</button>
+<button type="button" id="btnMesaSair" style="border-color: var(--line); color: var(--text-dim);" hidden>Desconectar</button>
+</div>
+</div>
+<p class="arquivo-nota" id="mesaStatus">Não conectado. Com o código da mesa, sua ficha é enviada ao mestre automaticamente enquanto você edita.</p>
+</div>
+<div class="box">
+<h2>Arquivo</h2>
+<div class="botoes">
+<button onclick="exportarFicha()">Baixar ficha</button>
+<input type="file" id="importarArquivo" style="display:none" onchange="importarFicha(event)">
+<button onclick="document.getElementById('importarArquivo').click()">Importar ficha</button>
+<button type="button" id="limparFichaBtn" style="border-color: var(--line); color: var(--text-dim);">Limpar ficha</button>
+</div>
+<p class="arquivo-nota">A ficha é salva automaticamente neste navegador enquanto você edita. Use "Baixar ficha" para guardar uma cópia de backup ou levar o personagem para outro aparelho.</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<aside class="coluna-lateral" id="colunaLateral">
+<div class="ranqueador" id="ranqueador">
+<span class="ranq-canto tl"></span><span class="ranq-canto tr"></span><span class="ranq-canto bl"></span><span class="ranq-canto br"></span>
+<div class="ranq-cabecalho" id="ranqCabecalho">
+<svg class="ranq-drone" viewBox="0 0 64 64" aria-hidden="true">
+<path class="asa esq" d="M22 30 L3 19 L8 37 Z"/>
+<path class="asa dir" d="M42 30 L61 19 L56 37 Z"/>
+<path class="antena" d="M32 19 L32 9"/>
+<circle class="antena-ponta" cx="32" cy="7.5" r="2.4"/>
+<circle class="corpo" cx="32" cy="34" r="15"/>
+<circle class="anel" cx="32" cy="34" r="10.5"/>
+<path class="fenda" d="M17.5 34 H23 M41 34 H46.5"/>
+<circle class="olho" cx="32" cy="34" r="5"/>
+</svg>
+<div class="ranq-titulos"><small>REDE DOS CAMPEÕES</small><strong>RANQUEADOR</strong></div>
+<span class="ranq-status" id="ranqStatus">● PRÉVIA</span>
+<span class="ranq-seta">▾</span>
+</div>
+<div class="ranq-corpo">
+<div class="ranq-subtitulo"><span>RANK DOS CAMPEÕES</span><span>TOP 10</span></div>
+<ol class="elite-lista" id="eliteLista"></ol>
+<div class="ranq-rodape"><span>CAMPEÕES <b id="ranqContagem">00/10</b></span><span id="ranqHora">00:00</span></div>
+</div>
+</div>
+</aside>
+</div>
+
+<div class="modal" id="cropModal" hidden>
+<div class="modal-card">
+<h2>Recortar foto</h2>
+<div class="crop-area" id="cropArea"><img id="cropImg" alt=""></div>
+<p class="crop-dica">Arraste para posicionar e use o zoom para enquadrar.</p>
+<div class="field crop-zoom"><label>Zoom</label><input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1"></div>
+<div class="botoes">
+<button type="button" id="cropConfirmar">Confirmar</button>
+<button type="button" id="cropCancelar" style="border-color: var(--line); color: var(--text-dim);">Cancelar</button>
+</div>
+</div>
+</div>
+
+<script>
+let lastChecked = {};
+let pronto = false;
+let saveTimeout = null;
+const STORAGE_KEY = "personagem-fracture";
+
+// Usa o armazenamento do Claude quando existir; em qualquer site (ex: GitHub Pages) usa o localStorage do navegador
+const armazenamento = {
+    async get(chave) {
+        if (window.storage) {
+            const r = await window.storage.get(chave, false);
+            return r && r.value ? r.value : null;
+        }
+        return localStorage.getItem(chave);
+    },
+    async set(chave, valor) {
+        if (window.storage) {
+            await window.storage.set(chave, valor, false);
+            return;
+        }
+        localStorage.setItem(chave, valor);
+    }
+};
+
+function getNivel(){
+    let n = parseInt(document.getElementById("nivel").value, 10);
+    if (isNaN(n) || n < 1) n = 1;
+    return n;
+}
+
+function statInputHandler(e){
+    const id = e.target.id;
+    const stats = ["fis","men","con","agi","pre","von"];
+    const base = 6;
+    const max = 12 + ((getNivel() - 1) * 3);
+
+    let val = parseInt(e.target.value, 10);
+    if (isNaN(val) || val < 1) val = 1;
+
+    const othersTotal = stats
+        .filter(s => s !== id)
+        .reduce((sum, s) => {
+            let v = parseInt(document.getElementById(s).value, 10);
+            if (isNaN(v) || v < 1) v = 1;
+            return sum + v;
+        }, 0);
+
+    const allowed = Math.max(1, max - (othersTotal - base));
+    if (val > allowed) val = allowed;
+
+    e.target.value = val;
+    updateAll();
+}
+
+function formatarBounty(v) {
+    const d = String(v === undefined || v === null ? "" : v).replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+    return d.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function updateAll() {
+    const nivel = getNivel();
+    const max = 12 + ((nivel - 1) * 3);
+    const base = 6;
+    const stats = ["fis","men","con","agi","pre","von"];
+
+    let total = 0;
+    stats.forEach(id => {
+        let v = parseInt(document.getElementById(id).value, 10);
+        if (isNaN(v) || v < 1) { v = 1; document.getElementById(id).value = 1; }
+        total += v;
+    });
+
+    const restantes = max - (total - base);
+    const pontosEl = document.getElementById("pontos");
+    const pontosBox = document.getElementById("pontosBox");
+    pontosEl.innerText = restantes;
+    pontosBox.classList.toggle("aviso", restantes < 0);
+    definirBadge("badgePersonagem", restantes);
+
+    const con = parseInt(document.getElementById("con").value, 10) || 1;
+    const von = parseInt(document.getElementById("von").value, 10) || 1;
+
+    const vida = 20 + (con * 5);
+    const energia = 20 + (von * 5);
+
+    document.getElementById("vidaMax").innerText = vida;
+    document.getElementById("energiaMax").innerText = energia;
+    document.getElementById("calcVida").innerText = `(20 + ${con}×5)`;
+    document.getElementById("calcEnergia").innerText = `(20 + ${von}×5)`;
+
+    const vidaAtualEl = document.getElementById("vidaAtual");
+    const energiaAtualEl = document.getElementById("energiaAtual");
+
+    if (vidaAtualEl.value === "") vidaAtualEl.value = vida;
+    if (energiaAtualEl.value === "") energiaAtualEl.value = energia;
+
+    if (parseInt(vidaAtualEl.value, 10) > vida) vidaAtualEl.value = vida;
+    if (parseInt(energiaAtualEl.value, 10) > energia) energiaAtualEl.value = energia;
+
+    updateBars();
+    updatePericias();
+    atualizarTopo();
+    if (typeof atualizarInfoPericia === "function" && document.getElementById("rolPericia")) atualizarInfoPericia();
+}
+
+function updateBars() {
+    const vAtual = Math.max(0, parseInt(document.getElementById("vidaAtual").value, 10) || 0);
+    const vMax = parseInt(document.getElementById("vidaMax").innerText, 10) || 1;
+
+    const eAtual = Math.max(0, parseInt(document.getElementById("energiaAtual").value, 10) || 0);
+    const eMax = parseInt(document.getElementById("energiaMax").innerText, 10) || 1;
+
+    document.getElementById("vidaBar").style.width = Math.min(100, (vAtual / vMax * 100)) + "%";
+    document.getElementById("energiaBar").style.width = Math.min(100, (eAtual / eMax * 100)) + "%";
+    atualizarTopo();
+}
+
+function updatePericias() {
+    const nivel = getNivel();
+    const maxPericias = 4 + Math.floor((nivel - 1) / 5);
+
+    const radios = document.querySelectorAll(".pericias-tabela input[type=radio]");
+    let pontosGastos = 0;
+
+    radios.forEach(r => {
+        if (r.checked) {
+            const linha = r.closest(".linha");
+            const radiosDaLinha = [...linha.querySelectorAll('input[type="radio"]')];
+            const indice = radiosDaLinha.indexOf(r);
+            pontosGastos += indice + 1; // treinado=1, especializado=2, mestre=3
+        }
+    });
+
+    const restantes = maxPericias - pontosGastos;
+    const periciasEl = document.getElementById("periciasRestantes");
+    const periciasBox = document.getElementById("periciasBox");
+    periciasEl.innerText = restantes;
+    periciasBox.classList.toggle("aviso", restantes < 0);
+    definirBadge("badgePericias", restantes);
+
+    document.querySelectorAll(".pericias-tabela .linha:not(.header)").forEach(linha => {
+        const radiosDaLinha = [...linha.querySelectorAll('input[type="radio"]')];
+        const marcado = radiosDaLinha.findIndex(r => r.checked);
+
+        radiosDaLinha.forEach((radio, i) => {
+            if (radio.checked) { radio.disabled = false; return; }
+            const custoNovo = i + 1;
+            const custoAtual = marcado >= 0 ? marcado + 1 : 0;
+            const custoExtra = custoNovo - custoAtual;
+            radio.disabled = custoExtra > restantes;
+        });
+    });
+}
+
+/* ---------- Poderes e Habilidades (listas dinâmicas) ---------- */
+
+function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+function criarPoderCard(dados) {
+    dados = dados || {};
+    const card = document.createElement("div");
+    card.className = "card-dinamico poder-card";
+    card.innerHTML = `
+        <div class="linha-topo">
+            <input class="poder-nome" placeholder="Nome do poder" value="${escapeHtml(dados.nome || "")}">
+            <button type="button" class="botao-remover" title="Remover poder">×</button>
+        </div>
+        <textarea class="poder-descricao" rows="2" placeholder="Descrição">${escapeHtml(dados.descricao || "")}</textarea>
+    `;
+    card.querySelector(".botao-remover").addEventListener("click", () => {
+        card.remove();
+        agendarSalvamento();
+    });
+    card.querySelectorAll("input, textarea").forEach(el => el.addEventListener("input", agendarSalvamento));
+    document.getElementById("poderesLista").appendChild(card);
+    return card;
+}
+
+function adicionarBotaoNgc(container) {
+    container.innerHTML = `<button type="button" class="botao-ngc">+ Versão aprimorada</button>`;
+    container.querySelector(".botao-ngc").addEventListener("click", () => {
+        adicionarNgc(container, {});
+        agendarSalvamento();
+    });
+}
+
+function adicionarNgc(container, dados) {
+    dados = dados || {};
+    container.innerHTML = `
+        <div class="ngc-secao">
+            <div class="ngc-titulo">
+                <span>Versão Aprimorada</span>
+                <button type="button" class="botao-remover ngc-remover" title="Remover versão aprimorada">×</button>
+            </div>
+            <textarea class="ngc-descricao" rows="2" placeholder="O que muda nesta versão">${escapeHtml(dados.descricao || "")}</textarea>
+            <div class="field energia-campo"><label>Gasto de Energia</label><input class="ngc-energia" placeholder="X" value="${escapeHtml(dados.energia || "")}"></div>
+        </div>
+    `;
+    container.querySelectorAll("input, textarea").forEach(el => el.addEventListener("input", agendarSalvamento));
+    container.querySelector(".ngc-remover").addEventListener("click", () => {
+        adicionarBotaoNgc(container);
+        agendarSalvamento();
+    });
+}
+
+function criarHabilidadeCard(dados) {
+    dados = dados || {};
+    const card = document.createElement("div");
+    card.className = "card-dinamico habilidade-card";
+
+    const execucaoOpts = ["Livre", "Reação", "Movimento", "Padrão", "Completa"];
+    const alcanceOpts = ["Pessoal", "Toque", "A Distância"];
+    const duracaoOpts = ["Instantânea", "1 rodada", "X rodadas", "Cena"];
+    const opcoes = (lista, selecionado) => `<option value="">Selecione</option>` +
+        lista.map(o => `<option value="${o}"${o === selecionado ? " selected" : ""}>${o}</option>`).join("");
+
+    card.innerHTML = `
+        <div class="linha-topo">
+            <input class="hab-nome" placeholder="Nome da habilidade" value="${escapeHtml(dados.nome || "")}">
+            <button type="button" class="botao-remover" title="Remover habilidade">×</button>
+        </div>
+        <textarea class="hab-descricao" rows="2" placeholder="Descrição">${escapeHtml(dados.descricao || "")}</textarea>
+        <div class="campos-habilidade">
+            <div class="field"><label>Execução</label><select class="hab-execucao">${opcoes(execucaoOpts, dados.execucao)}</select></div>
+            <div class="field"><label>Alcance</label><select class="hab-alcance">${opcoes(alcanceOpts, dados.alcance)}</select></div>
+            <div class="field">
+                <label>Duração</label>
+                <select class="hab-duracao">${opcoes(duracaoOpts, dados.duracao)}</select>
+                <div class="duracao-extra energia-campo" style="display:none;"><label>Quantas rodadas</label><input class="hab-duracao-valor" placeholder="X" value="${escapeHtml(dados.duracaoValor || "")}"></div>
+            </div>
+        </div>
+        <div class="field energia-campo"><label>Gasto de Energia</label><input class="hab-energia" placeholder="X" value="${escapeHtml(dados.energia || "")}"></div>
+        <div class="ngc-container"></div>
+    `;
+
+    card.querySelector(".botao-remover").addEventListener("click", () => {
+        card.remove();
+        agendarSalvamento();
+    });
+    card.querySelectorAll("input, textarea, select").forEach(el => el.addEventListener("input", agendarSalvamento));
+
+    const duracaoSelect = card.querySelector(".hab-duracao");
+    const duracaoExtra = card.querySelector(".duracao-extra");
+    const atualizarDuracaoExtra = () => {
+        duracaoExtra.style.display = duracaoSelect.value === "X rodadas" ? "flex" : "none";
+    };
+    duracaoSelect.addEventListener("change", atualizarDuracaoExtra);
+    atualizarDuracaoExtra();
+
+    const ngcContainer = card.querySelector(".ngc-container");
+    if (dados.ngc) {
+        adicionarNgc(ngcContainer, dados.ngc);
+    } else {
+        adicionarBotaoNgc(ngcContainer);
+    }
+
+    document.getElementById("habilidadesLista").appendChild(card);
+    return card;
+}
+
+function criarObjetivoCard(dados) {
+    dados = dados || {};
+    const card = document.createElement("div");
+    card.className = "card-dinamico objetivo-card";
+    card.innerHTML = `
+        <div class="linha-topo">
+            <input class="objetivo-nome" placeholder="Sonho / Objetivo" value="${escapeHtml(dados.nome || "")}">
+            <button type="button" class="botao-remover" title="Remover objetivo">×</button>
+        </div>
+        <textarea class="objetivo-descricao" rows="2" placeholder="Descrição">${escapeHtml(dados.descricao || "")}</textarea>
+    `;
+    card.querySelector(".botao-remover").addEventListener("click", () => {
+        card.remove();
+        agendarSalvamento();
+    });
+    card.querySelectorAll("input, textarea").forEach(el => el.addEventListener("input", agendarSalvamento));
+    document.getElementById("objetivosLista").appendChild(card);
+    return card;
+}
+
+/* ---------- Rolagem ---------- */
+
+const atributoNomes = { fis: "Físico", men: "Mental", con: "Constituição", agi: "Agilidade", pre: "Presença", von: "Vontade" };
+
+const periciasInfo = [
+    { chave: "luta", nome: "Luta", atributo: "fis" },
+    { chave: "diplomacia", nome: "Diplomacia", atributo: "pre" },
+    { chave: "persuasao", nome: "Persuasão", atributo: "pre" },
+    { chave: "enganacao", nome: "Enganação", atributo: "pre" },
+    { chave: "seducao", nome: "Sedução", atributo: "pre" },
+    { chave: "furtividade", nome: "Furtividade", atributo: "agi" },
+    { chave: "distracao", nome: "Distração", atributo: "pre" },
+    { chave: "fuga", nome: "Fuga", atributo: "agi" },
+    { chave: "criminalidade", nome: "Criminalidade", atributo: "men" },
+    { chave: "investigacao", nome: "Investigação", atributo: "men" },
+    { chave: "inteligencia", nome: "Inteligência", atributo: "men" },
+    { chave: "percepcao", nome: "Percepção", atributo: "men" },
+    { chave: "pressentimento", nome: "Pressentimento", atributo: "von" },
+    { chave: "reflexo", nome: "Reflexo", atributo: "agi" },
+    { chave: "pontaria", nome: "Pontaria", atributo: "fis" },
+    { chave: "iniciativa", nome: "Iniciativa", atributo: "agi" },
+    { chave: "controle", nome: "Controle", atributo: "von" },
+    { chave: "resistencia", nome: "Resistência", atributo: "con" },
+    { chave: "determinacao", nome: "Determinação", atributo: "von" },
+    { chave: "tranquilidade", nome: "Tranquilidade", atributo: "von" },
+    { chave: "magia", nome: "Magia", atributo: "von" },
+    { chave: "adestramento", nome: "Adestramento", atributo: "pre" }
+];
+
+let historico = [];
+
+function popularSelectPericias() {
+    const select = document.getElementById("rolPericia");
+    periciasInfo.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.chave;
+        opt.textContent = p.nome;
+        select.appendChild(opt);
+    });
+}
+
+function tierBonusDaPericia(chave) {
+    const radios = document.querySelectorAll(`input[name="${chave}"]`);
+    const idx = [...radios].findIndex(r => r.checked);
+    if (idx === -1) return { bonus: 0, tier: "Não treinado" };
+    const tiers = ["Treinado", "Especializado", "Mestre"];
+    const bonusPorTier = [2, 4, 6];
+    return { bonus: bonusPorTier[idx], tier: tiers[idx] };
+}
+
+function atualizarInfoPericia() {
+    const select = document.getElementById("rolPericia");
+    const chave = select.value;
+    const info = document.getElementById("rolPericiaInfo");
+    const atributoLivreCampo = document.getElementById("rolAtributoLivreCampo");
+
+    let atributoId, atributoNome, bonusTreino = 0, tierTexto = "";
+
+    if (chave === "") {
+        atributoLivreCampo.style.display = "flex";
+        atributoId = document.getElementById("rolAtributoLivre").value;
+        atributoNome = atributoNomes[atributoId];
+    } else {
+        atributoLivreCampo.style.display = "none";
+        const pericia = periciasInfo.find(p => p.chave === chave);
+        atributoId = pericia.atributo;
+        atributoNome = atributoNomes[atributoId];
+        const t = tierBonusDaPericia(chave);
+        bonusTreino = t.bonus;
+        tierTexto = t.tier;
+    }
+
+    const valorAtributo = parseInt(document.getElementById(atributoId).value, 10) || 0;
+    const partes = [`${atributoNome} ${valorAtributo}`];
+    if (chave !== "") partes.push(`${tierTexto} ${bonusTreino >= 0 ? "+" : ""}${bonusTreino}`);
+    info.innerText = `${partes.join(" + ")} = ${valorAtributo + bonusTreino}`;
+
+    return { atributoId, valorAtributo, bonusTreino };
+}
+
+function rolarDado(lados) {
+    return Math.floor(Math.random() * lados) + 1;
+}
+
+function adicionarHistorico(item) {
+    historico.unshift(item);
+    if (historico.length > 3) historico.pop();
+    renderizarHistorico();
+}
+
+function renderizarHistorico() {
+    const lista = document.getElementById("historicoLista");
+    const vazio = document.getElementById("historicoVazio");
+    lista.innerHTML = "";
+
+    if (historico.length === 0) {
+        vazio.style.display = "block";
+        return;
+    }
+    vazio.style.display = "none";
+
+    historico.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "card-dinamico historico-item";
+        const grauHtml = item.grau ? `<span class="grau-badge grau-${item.corGrau}">${escapeHtml(item.grau)}</span>` : "";
+        div.innerHTML = `
+            <div class="linha-topo">
+                <strong>${escapeHtml(item.titulo)}</strong>
+                ${grauHtml}
+            </div>
+            <div class="small">${escapeHtml(item.detalhe)}</div>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+function rolarTestePericia() {
+    const chave = document.getElementById("rolPericia").value;
+    const { atributoId, valorAtributo, bonusTreino } = atualizarInfoPericia();
+    const modificador = parseInt(document.getElementById("rolModPericia").value, 10) || 0;
+    const dificuldadeStr = document.getElementById("rolDificuldade").value;
+
+    const d20 = rolarDado(20);
+    const bonusTotal = valorAtributo + bonusTreino + modificador;
+    const total = d20 + bonusTotal;
+
+    const nomeRolagem = chave === ""
+        ? `Rolagem livre (${atributoNomes[atributoId]})`
+        : periciasInfo.find(p => p.chave === chave).nome;
+
+    let grau = null;
+    let corGrau = null;
+    if (dificuldadeStr !== "") {
+        const dificuldade = parseInt(dificuldadeStr, 10);
+        if (total >= dificuldade) { grau = "Sucesso"; corGrau = "sucesso"; }
+        else { grau = "Falha"; corGrau = "falha"; }
+    }
+
+    adicionarHistorico({
+        titulo: nomeRolagem,
+        detalhe: `d20 (${d20}) + ${bonusTotal} = ${total}`,
+        grau,
+        corGrau
+    });
+}
+
+function rolarOutrosDados() {
+    const lados = parseInt(document.getElementById("rolDado").value, 10);
+    const qtd = Math.max(1, parseInt(document.getElementById("rolQtd").value, 10) || 1);
+    const modificador = parseInt(document.getElementById("rolModDados").value, 10) || 0;
+    const rotulo = document.getElementById("rolRotulo").value.trim();
+
+    const resultados = [];
+    let soma = 0;
+    for (let i = 0; i < qtd; i++) {
+        const r = rolarDado(lados);
+        resultados.push(r);
+        soma += r;
+    }
+    const total = soma + modificador;
+    const sufixoMod = modificador ? ` ${modificador > 0 ? "+" : "-"} ${Math.abs(modificador)}` : "";
+
+    adicionarHistorico({
+        titulo: rotulo || `${qtd}d${lados}`,
+        detalhe: `[${resultados.join(" + ")}]${sufixoMod} = ${total}`,
+        grau: null,
+        corGrau: null
+    });
+}
+
+function coletarObjetivos() {
+    return [...document.querySelectorAll("#objetivosLista .objetivo-card")].map(card => ({
+        nome: card.querySelector(".objetivo-nome").value,
+        descricao: card.querySelector(".objetivo-descricao").value
+    }));
+}
+
+function coletarPoderes() {
+    return [...document.querySelectorAll("#poderesLista .poder-card")].map(card => ({
+        nome: card.querySelector(".poder-nome").value,
+        descricao: card.querySelector(".poder-descricao").value
+    }));
+}
+
+function coletarHabilidades() {
+    return [...document.querySelectorAll("#habilidadesLista .habilidade-card")].map(card => {
+        const ngcSecao = card.querySelector(".ngc-secao");
+        const item = {
+            nome: card.querySelector(".hab-nome").value,
+            descricao: card.querySelector(".hab-descricao").value,
+            execucao: card.querySelector(".hab-execucao").value,
+            alcance: card.querySelector(".hab-alcance").value,
+            duracao: card.querySelector(".hab-duracao").value,
+            duracaoValor: card.querySelector(".hab-duracao-valor").value,
+            energia: card.querySelector(".hab-energia").value,
+            ngc: null
+        };
+        if (ngcSecao) {
+            item.ngc = {
+                descricao: ngcSecao.querySelector(".ngc-descricao").value,
+                energia: ngcSecao.querySelector(".ngc-energia").value
+            };
+        }
+        return item;
+    });
+}
+
+/* ---------- Foto do personagem + recorte quadrado ---------- */
+
+const CROP_SIZE = 280;
+const FOTO_SAIDA = 400;
+const cropState = { w: 0, h: 0, base: 1, zoom: 1, x: 0, y: 0 };
+let fotoDados = "";
+let arrastando = null;
+
+function mostrarFoto() {
+    const img = document.getElementById("fotoImg");
+    const placeholder = document.getElementById("fotoPlaceholder");
+    const remover = document.getElementById("fotoRemover");
+    if (fotoDados) {
+        img.src = fotoDados;
+        img.hidden = false;
+        placeholder.hidden = true;
+        remover.hidden = false;
+    } else {
+        img.removeAttribute("src");
+        img.hidden = true;
+        placeholder.hidden = false;
+        remover.hidden = true;
+    }
+    atualizarTopo();
+}
+
+function aplicarCrop() {
+    const img = document.getElementById("cropImg");
+    const s = cropState.base * cropState.zoom;
+    const minX = CROP_SIZE - cropState.w * s;
+    const minY = CROP_SIZE - cropState.h * s;
+    cropState.x = Math.min(0, Math.max(minX, cropState.x));
+    cropState.y = Math.min(0, Math.max(minY, cropState.y));
+    img.style.width = (cropState.w * s) + "px";
+    img.style.height = (cropState.h * s) + "px";
+    img.style.left = cropState.x + "px";
+    img.style.top = cropState.y + "px";
+}
+
+function abrirCrop(dataUrl) {
+    const img = document.getElementById("cropImg");
+    img.onload = () => {
+        cropState.w = img.naturalWidth;
+        cropState.h = img.naturalHeight;
+        cropState.base = CROP_SIZE / Math.min(cropState.w, cropState.h);
+        cropState.zoom = 1;
+        document.getElementById("cropZoom").value = 1;
+        cropState.x = (CROP_SIZE - cropState.w * cropState.base) / 2;
+        cropState.y = (CROP_SIZE - cropState.h * cropState.base) / 2;
+        aplicarCrop();
+    };
+    img.removeAttribute("src");
+    img.src = dataUrl;
+    document.getElementById("cropModal").hidden = false;
+}
+
+function fecharCrop() {
+    document.getElementById("cropModal").hidden = true;
+    document.getElementById("cropImg").removeAttribute("src");
+}
+
+function confirmarCrop() {
+    const img = document.getElementById("cropImg");
+    const s = cropState.base * cropState.zoom;
+    const canvas = document.createElement("canvas");
+    canvas.width = FOTO_SAIDA;
+    canvas.height = FOTO_SAIDA;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, -cropState.x / s, -cropState.y / s, CROP_SIZE / s, CROP_SIZE / s, 0, 0, FOTO_SAIDA, FOTO_SAIDA);
+    fotoDados = canvas.toDataURL("image/jpeg", 0.85);
+    mostrarFoto();
+    fecharCrop();
+    agendarSalvamento();
+}
+
+/* ---------- Coleta / aplica estado (usado por salvar, exportar e importar) ---------- */
+
+function coletarEstado() {
+    const campos = {};
+    document.querySelectorAll("[data-key]").forEach(el => {
+        campos[el.dataset.key] = el.value;
+    });
+
+    const pericias = {};
+    document.querySelectorAll(".pericias-tabela input[type=radio]").forEach(r => {
+        if (r.checked) {
+            const linha = r.closest(".linha");
+            const radiosDaLinha = [...linha.querySelectorAll('input[type="radio"]')];
+            pericias[r.name] = radiosDaLinha.indexOf(r);
+        }
+    });
+
+    return { versao: 5, campos, pericias, poderes: coletarPoderes(), habilidades: coletarHabilidades(), objetivos: coletarObjetivos(), foto: fotoDados };
+}
+
+function aplicarEstado(estado) {
+    if (!estado) return;
+
+    if (estado.campos) {
+        Object.entries(estado.campos).forEach(([key, val]) => {
+            const el = document.querySelector(`[data-key="${key}"]`);
+            if (el) el.value = val;
+        });
+    }
+
+    document.querySelectorAll(".pericias-tabela input[type=radio]").forEach(r => r.checked = false);
+    lastChecked = {};
+
+    if (estado.pericias) {
+        Object.entries(estado.pericias).forEach(([name, idx]) => {
+            if (idx === null || idx === undefined) return;
+            const radiosDoNome = document.querySelectorAll(`input[name="${name}"]`);
+            const r = radiosDoNome[idx];
+            if (r) { r.checked = true; lastChecked[name] = r; }
+        });
+    }
+
+    document.getElementById("poderesLista").innerHTML = "";
+    document.getElementById("habilidadesLista").innerHTML = "";
+    document.getElementById("objetivosLista").innerHTML = "";
+    (estado.poderes || []).forEach(p => criarPoderCard(p));
+    (estado.habilidades || []).forEach(h => criarHabilidadeCard(h));
+    (estado.objetivos || []).forEach(o => criarObjetivoCard(o));
+
+    fotoDados = typeof estado.foto === "string" ? estado.foto : "";
+    mostrarFoto();
+
+    updateAll();
+}
+
+/* ---------- Baixar / importar arquivo (backup manual) ---------- */
+
+function exportarFicha() {
+    const estado = coletarEstado();
+    const blob = new Blob([JSON.stringify(estado, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Ficha-De-Personagem-Fracture.json";
+    a.click();
+}
+
+function importarFicha(e) {
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+        try {
+            const estado = JSON.parse(ev.target.result);
+            aplicarEstado(estado);
+            agendarSalvamento();
+        } catch (err) {
+            alert("Não foi possível ler este arquivo de ficha.");
+        }
+    };
+    reader.readAsText(e.target.files[0]);
+    e.target.value = "";
+}
+
+/* ---------- Salvamento automático ---------- */
+
+function marcarStatusSalvo(texto, ativo) {
+    const el = document.getElementById("statusSalvo");
+    const txt = document.getElementById("statusSalvoTexto");
+    txt.innerText = texto;
+    el.classList.toggle("ativo", ativo);
+}
+
+async function salvarFicha() {
+    try {
+        const estado = coletarEstado();
+        await armazenamento.set(STORAGE_KEY, JSON.stringify(estado));
+        const agora = new Date();
+        const hh = String(agora.getHours()).padStart(2, "0");
+        const mm = String(agora.getMinutes()).padStart(2, "0");
+        marcarStatusSalvo(`salvo às ${hh}:${mm}`, true);
+        nuvemAgendarEnvio();
+    } catch (err) {
+        console.error("Erro ao salvar ficha:", err);
+        marcarStatusSalvo("erro ao salvar", false);
+    }
+}
+
+function agendarSalvamento() {
+    if (!pronto) return;
+    marcarStatusSalvo("salvando…", false);
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(salvarFicha, 700);
+}
+
+async function carregarFicha() {
+    try {
+        const valorSalvo = await armazenamento.get(STORAGE_KEY);
+        if (valorSalvo) {
+            aplicarEstado(JSON.parse(valorSalvo));
+            marcarStatusSalvo("ficha carregada", true);
+        } else {
+            updateAll();
+        }
+    } catch (err) {
+        // nada salvo ainda para este personagem
+        updateAll();
+    } finally {
+        pronto = true;
+        iniciarNuvem();
+    }
+}
+
+/* ---------- Painel: barra superior e abas ---------- */
+
+const ABAS = ["personagem", "pericias", "equipamentos", "poderes", "historia", "config"];
+
+function definirBadge(id, valor) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerText = valor > 0 ? String(valor) : (valor < 0 ? "!" : "");
+    el.classList.toggle("alerta", valor < 0);
+}
+
+// Resumo fixo no topo: foto, nome, level, bounty, vida e energia
+function atualizarTopo() {
+    const topoNome = document.getElementById("topoNome");
+    if (!topoNome) return;
+    const nomeEl = document.querySelector('[data-key="nome"]');
+    const nome = ((nomeEl && nomeEl.value) || "").trim() || "Sem nome";
+    topoNome.innerText = nome;
+
+    const bountyEl = document.getElementById("bounty");
+    const bounty = bountyEl ? bountyEl.value : "";
+    document.getElementById("topoSub").innerText = "Lv " + (document.getElementById("nivel").value || "1") + (bounty ? " · Bounty " + bounty : "");
+
+    const foto = document.getElementById("topoFoto");
+    if (typeof fotoDados === "string" && fotoDados) {
+        foto.style.backgroundImage = 'url("' + fotoDados + '")';
+        foto.innerText = "";
+    } else {
+        foto.style.backgroundImage = "";
+        foto.innerText = nome.charAt(0).toUpperCase();
+    }
+
+    const vAtual = Math.max(0, parseInt(document.getElementById("vidaAtual").value, 10) || 0);
+    const vMax = parseInt(document.getElementById("vidaMax").innerText, 10) || 1;
+    const eAtual = Math.max(0, parseInt(document.getElementById("energiaAtual").value, 10) || 0);
+    const eMax = parseInt(document.getElementById("energiaMax").innerText, 10) || 1;
+    document.getElementById("topoVidaBar").style.width = Math.min(100, vAtual / vMax * 100) + "%";
+    document.getElementById("topoEnergiaBar").style.width = Math.min(100, eAtual / eMax * 100) + "%";
+    document.getElementById("topoVidaTxt").innerText = vAtual + "/" + vMax;
+    document.getElementById("topoEnergiaTxt").innerText = eAtual + "/" + eMax;
+}
+
+function abrirAba(nome, opts) {
+    opts = opts || {};
+    if (ABAS.indexOf(nome) < 0) nome = "personagem";
+    document.querySelectorAll(".aba").forEach(a => { a.hidden = a.dataset.aba !== nome; });
+    document.querySelectorAll("#menuPrincipal .menu-item").forEach(b => {
+        const ativo = b.dataset.aba === nome;
+        b.classList.toggle("ativo", ativo);
+        b.setAttribute("aria-current", ativo ? "page" : "false");
+    });
+    try { if (!opts.semHash) history.replaceState(null, "", "#" + nome); } catch (err) { /* sem problema */ }
+    if (!opts.semRolar && window.scrollTo) window.scrollTo({ top: 0 });
+}
+
+function iniciarAbas() {
+    document.querySelectorAll("#menuPrincipal .menu-item").forEach(b => b.addEventListener("click", () => abrirAba(b.dataset.aba)));
+    let inicial = "";
+    try { inicial = (location.hash || "").replace("#", ""); } catch (err) { /* sem problema */ }
+    abrirAba(inicial, { semHash: true, semRolar: true });
+}
+
+/* ---------- Ranqueador: rank dos campeões (top 10) ---------- */
+
+const RANQ_DOC = "mestre-ranqueador";
+const RANQ_CACHE_KEY = "fracture-ranq-cache";
+
+let ranqEstado = { liberado: false, itens: [] };
+let ranqNomesAnteriores = null;
+let ranqPrimeiraLeitura = true;
+
+function eliteHash(txt) {
+    let h = 0;
+    for (let i = 0; i < txt.length; i++) h = (h * 31 + txt.charCodeAt(i)) >>> 0;
+    return h;
+}
+
+function eliteChave(nome) { return String(nome || "").trim().toLowerCase(); }
+
+// Foto padrão (silhueta) para quem ainda não tem foto
+function eliteAvatarPadrao(nome) {
+    const vazio = !nome;
+    const hue = eliteHash(nome || "?") % 360;
+    const c1 = vazio ? "#1a1620" : `hsl(${hue} 55% 32%)`;
+    const c2 = vazio ? "#0e0b13" : `hsl(${(hue + 40) % 360} 60% 14%)`;
+    const fg = vazio ? "#3a3446" : "rgba(255,255,255,0.78)";
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/></linearGradient></defs><rect width='100' height='100' fill='url(#g)'/><circle cx='50' cy='38' r='17' fill='${fg}'/><path d='M14 100c0-22 16-36 36-36s36 14 36 36z' fill='${fg}'/></svg>`;
+    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function eliteFotoSrc(item) {
+    const foto = item && typeof item.foto === "string" && item.foto.indexOf("data:image/") === 0 ? item.foto : "";
+    return foto || eliteAvatarPadrao(String((item && item.nome) || "").trim());
+}
+
+// Desenha as 10 posições. Com { deltas: true } marca quem subiu, desceu ou entrou desde o desenho anterior.
+function renderizarElite(itens, opts) {
+    opts = opts || {};
+    const lista = document.getElementById("eliteLista");
+    const anteriores = opts.deltas ? ranqNomesAnteriores : null;
+    const atuais = [];
+    lista.innerHTML = "";
+
+    for (let i = 0; i < 10; i++) {
+        const item = (itens && itens[i]) || {};
+        const nome = String(item.nome || "").trim();
+        const chave = eliteChave(nome);
+        atuais.push(chave);
+
+        let delta = null;
+        if (anteriores && chave) {
+            const antes = anteriores.indexOf(chave);
+            if (antes === -1) delta = { cls: "novo", txt: "NOVO" };
+            else if (antes > i) delta = { cls: "sobe", txt: "▲ " + (antes - i) };
+            else if (antes < i) delta = { cls: "desce", txt: "▼ " + (i - antes) };
+        }
+
+        const li = document.createElement("li");
+        li.className = "elite-item" + (i < 3 ? " top" + (i + 1) : "") + (nome ? "" : " vazio") + (delta ? " mudou" : "");
+        li.style.setProperty("--i", i);
+
+        const rank = document.createElement("span");
+        rank.className = "elite-rank";
+        rank.textContent = String(i + 1).padStart(2, "0");
+
+        const foto = document.createElement("img");
+        foto.className = "elite-foto";
+        foto.alt = nome || "Vaga livre";
+        foto.src = eliteFotoSrc(item);
+
+        const nomeEl = document.createElement("span");
+        nomeEl.className = "elite-nome";
+        nomeEl.textContent = nome || "???";
+
+        li.appendChild(rank);
+        li.appendChild(foto);
+        li.appendChild(nomeEl);
+
+        if (delta) {
+            const d = document.createElement("span");
+            d.className = "elite-delta " + delta.cls;
+            d.textContent = delta.txt;
+            li.appendChild(d);
+        }
+        lista.appendChild(li);
+    }
+
+    ranqNomesAnteriores = atuais;
+    document.getElementById("ranqContagem").innerText = String(atuais.filter(Boolean).length).padStart(2, "0") + "/10";
+}
+
+// Aceita só o que o painel do mestre envia: até 10 posições com nome (texto) e foto (imagem embutida)
+function sanearElite(arr) {
+    const saida = [];
+    (Array.isArray(arr) ? arr : []).slice(0, 10).forEach(x => {
+        x = x && typeof x === "object" ? x : {};
+        const foto = typeof x.foto === "string" && x.foto.indexOf("data:image/") === 0 ? x.foto : "";
+        saida.push({ nome: String(x.nome || "").slice(0, 40), foto });
+    });
+    return saida;
+}
+
+function salvarCacheRanq() {
+    try { armazenamento.set(RANQ_CACHE_KEY, JSON.stringify({ liberado: ranqEstado.liberado, itens: ranqEstado.itens })); } catch (err) { /* sem problema */ }
+}
+
+// Chamada quando o mestre publica (ou muda) o Ranqueador na mesa
+function nuvemReceberRanqueador(snap) {
+    const primeira = ranqPrimeiraLeitura;
+    ranqPrimeiraLeitura = false;
+
+    if (!snap.exists()) {
+        if (ranqEstado.liberado) definirRanqueador({ liberado: false }, { modo: "vivo" });
+        salvarCacheRanq();
+        return;
+    }
+    const d = snap.data();
+    let itens = [];
+    try { itens = sanearElite(JSON.parse(d.itens || "[]")); } catch (err) { itens = []; }
+    // a animação de entrega só toca quando a entrega acontece ao vivo, não ao abrir a página
+    definirRanqueador({ liberado: !!d.liberado, itens }, { animar: !primeira, modo: "vivo" });
+    salvarCacheRanq();
+}
+
+function mostrarAvisoRanqueador() {
+    const aviso = document.createElement("div");
+    aviso.className = "ranq-aviso";
+    const titulo = document.createElement("b");
+    titulo.textContent = "RANQUEADOR conectado";
+    aviso.appendChild(titulo);
+    aviso.appendChild(document.createElement("br"));
+    aviso.appendChild(document.createTextNode("Rank dos Campeões liberado"));
+    document.body.appendChild(aviso);
+    setTimeout(() => { if (aviso.remove) aviso.remove(); }, 4200);
+}
+
+// Liga/desliga o Ranqueador e atualiza o ranking. É a função que o painel do mestre vai chamar (ao vivo).
+function definirRanqueador(estado, opts) {
+    opts = opts || {};
+    const jaLiberado = ranqEstado.liberado;
+    ranqEstado = { liberado: !!estado.liberado, itens: estado.itens || ranqEstado.itens };
+
+    const layout = document.getElementById("layout");
+    const lateral = document.getElementById("colunaLateral");
+    const ranq = document.getElementById("ranqueador");
+    const status = document.getElementById("ranqStatus");
+
+    layout.classList.toggle("sem-lateral", !ranqEstado.liberado);
+    status.innerText = opts.modo === "vivo" ? "● AO VIVO" : "● PRÉVIA";
+    status.classList.toggle("vivo", opts.modo === "vivo");
+
+    renderizarElite(ranqEstado.itens, { deltas: jaLiberado && ranqEstado.liberado });
+
+    if (ranqEstado.liberado && !jaLiberado) {
+        ranq.classList.add("entrando");
+        setTimeout(() => ranq.classList.remove("entrando"), 1800);
+        if (opts.animar) {
+            lateral.classList.remove("entregando");
+            void lateral.offsetWidth;
+            lateral.classList.add("entregando");
+            setTimeout(() => lateral.classList.remove("entregando"), 1300);
+            mostrarAvisoRanqueador();
+        }
+    }
+    if (!ranqEstado.liberado) ranqNomesAnteriores = null;
+}
+
+function atualizarHoraElite() {
+    const d = new Date();
+    document.getElementById("ranqHora").innerText = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+}
+
+async function iniciarRanqueador() {
+    definirRanqueador({ liberado: false, itens: [] }, { modo: "vivo" });
+    atualizarHoraElite();
+    setInterval(atualizarHoraElite, 30000);
+
+    const telaPequena = () => !!(window.matchMedia && window.matchMedia("(max-width: 1199px)").matches);
+    const ranq = document.getElementById("ranqueador");
+    if (telaPequena()) ranq.classList.add("colapsado");
+    document.getElementById("ranqCabecalho").addEventListener("click", () => {
+        if (telaPequena()) ranq.classList.toggle("colapsado");
+    });
+
+    // mostra o último ranking recebido enquanto a conexão com a mesa não responde
+    try {
+        const guardado = await armazenamento.get(RANQ_CACHE_KEY);
+        if (guardado && ranqPrimeiraLeitura) {
+            const c = JSON.parse(guardado);
+            if (c && c.liberado) definirRanqueador({ liberado: true, itens: sanearElite(c.itens) }, { animar: false, modo: "vivo" });
+        }
+    } catch (err) { /* nada guardado */ }
+}
+
+iniciarRanqueador();
+iniciarAbas();
+
+/* ---------- Mesa online (Firebase) ---------- */
+
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDeXqt0I7nye8yq-6JULEZsXd7y9NRowXQ",
+    authDomain: "fracturerpg-1904d.firebaseapp.com",
+    projectId: "fracturerpg-1904d",
+    storageBucket: "fracturerpg-1904d.firebasestorage.app",
+    messagingSenderId: "192300879704",
+    appId: "1:192300879704:web:ec92ced11512faa576df2d"
+};
+const FIREBASE_VERSAO = "10.12.2";
+const NUVEM_KEY = "fracture-nuvem";
+
+const nuvem = { app: null, db: null, fs: null };
+let nuvemCfg = { mesa: "", id: "", mestreTs: 0 };
+let nuvemUnsub = null;
+let nuvemUnsubRanq = null;
+let nuvemTimer = null;
+
+async function nuvemIniciarSdk() {
+    if (nuvem.db) return;
+    const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSAO}`;
+    const [appMod, fs] = await Promise.all([
+        import(`${base}/firebase-app.js`),
+        import(`${base}/firebase-firestore.js`)
+    ]);
+    nuvem.app = appMod.initializeApp(FIREBASE_CONFIG);
+    nuvem.fs = fs;
+    nuvem.db = fs.initializeFirestore(nuvem.app, { experimentalAutoDetectLongPolling: true });
+}
+
+function nuvemRef() {
+    return nuvem.fs.doc(nuvem.db, "mesas", nuvemCfg.mesa, "fichas", nuvemCfg.id);
+}
+
+function nuvemErro(err) {
+    const codigo = err && err.code ? String(err.code) : "";
+    if (codigo.indexOf("permission-denied") >= 0) return "sem permissão: confira o código (8+ caracteres) e as regras do Firestore";
+    if (codigo.indexOf("unavailable") >= 0) return "sem conexão com a nuvem no momento";
+    if (err && /API key/i.test(String(err.message))) return "chave de API inválida: confira o FIREBASE_CONFIG";
+    if (err && /import|fetch|Failed to load|module/i.test(String(err.message))) return "não foi possível carregar o Firebase (sem internet?)";
+    return "erro na nuvem: " + (err && err.message ? err.message : "desconhecido");
+}
+
+function nuvemStatus(texto) {
+    const el = document.getElementById("mesaStatus");
+    if (el) el.innerText = texto;
+}
+
+function atualizarUiMesa() {
+    const conectado = !!nuvemCfg.mesa;
+    document.getElementById("mesaCodigo").value = nuvemCfg.mesa || document.getElementById("mesaCodigo").value;
+    document.getElementById("btnMesaConectar").hidden = conectado;
+    document.getElementById("btnMesaSair").hidden = !conectado;
+    document.getElementById("mesaCodigo").disabled = conectado;
+}
+
+async function nuvemSalvarCfg() {
+    try { await armazenamento.set(NUVEM_KEY, JSON.stringify(nuvemCfg)); } catch (err) { /* sem problema */ }
+}
+
+function gerarIdJogador() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
+// Decide se uma alteração de vida/energia feita pelo mestre ainda precisa ser aplicada nesta ficha
+function decidirMestre(d, tsAplicado) {
+    const base = Math.max(Number(tsAplicado) || 0, Number(d.aplicouMestreTs) || 0);
+    const ts = Number(d.mestreTs) || 0;
+    if (ts > base) return { aplicar: true, vida: d.mestreVida, energia: d.mestreEnergia, ts };
+    return { aplicar: false, ts: base };
+}
+
+function nuvemReceber(snap) {
+    if (!snap.exists() || snap.metadata.hasPendingWrites) return;
+    const dec = decidirMestre(snap.data(), nuvemCfg.mestreTs);
+
+    if (dec.ts !== nuvemCfg.mestreTs) {
+        nuvemCfg.mestreTs = dec.ts;
+        nuvemSalvarCfg();
+    }
+    if (!dec.aplicar) return;
+
+    if (dec.vida !== undefined && dec.vida !== null) document.getElementById("vidaAtual").value = dec.vida;
+    if (dec.energia !== undefined && dec.energia !== null) document.getElementById("energiaAtual").value = dec.energia;
+    updateAll();
+    agendarSalvamento();
+    nuvemStatus("O mestre atualizou sua vida/energia.");
+}
+
+function nuvemAgendarEnvio() {
+    if (!nuvemCfg.mesa || !nuvem.db) return;
+    clearTimeout(nuvemTimer);
+    nuvemTimer = setTimeout(nuvemEnviar, 1500);
+}
+
+async function nuvemEnviar() {
+    if (!nuvemCfg.mesa || !nuvem.db) return;
+    try {
+        const estado = coletarEstado();
+        await nuvem.fs.setDoc(nuvemRef(), {
+            dados: JSON.stringify(estado),
+            nome: estado.campos.nome || "",
+            atualizado: Date.now(),
+            aplicouMestreTs: nuvemCfg.mestreTs
+        }, { merge: true });
+        const agora = new Date();
+        nuvemStatus(`Conectado à mesa. Ficha enviada ao mestre às ${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}.`);
+    } catch (err) {
+        console.error("Erro ao enviar ficha:", err);
+        nuvemStatus("Erro: " + nuvemErro(err));
+    }
+}
+
+async function nuvemConectar(codigo) {
+    codigo = String(codigo || "").trim();
+    if (codigo.length < 8) {
+        nuvemStatus("O código da mesa precisa ter pelo menos 8 caracteres.");
+        return;
+    }
+    nuvemStatus("Conectando…");
+    try {
+        await nuvemIniciarSdk();
+        if (nuvemUnsub) { nuvemUnsub(); nuvemUnsub = null; }
+        if (nuvemUnsubRanq) { nuvemUnsubRanq(); nuvemUnsubRanq = null; }
+        if (!nuvemCfg.id) nuvemCfg.id = gerarIdJogador();
+        nuvemCfg.mesa = codigo;
+        await nuvemSalvarCfg();
+        atualizarUiMesa();
+        nuvemUnsub = nuvem.fs.onSnapshot(nuvemRef(), nuvemReceber, err => {
+            console.error("Erro na mesa:", err);
+            nuvemStatus("Erro: " + nuvemErro(err));
+        });
+        ranqPrimeiraLeitura = true;
+        nuvemUnsubRanq = nuvem.fs.onSnapshot(nuvem.fs.doc(nuvem.db, "mesas", codigo, "fichas", RANQ_DOC), nuvemReceberRanqueador, err => {
+            console.error("Erro no Ranqueador:", err);
+        });
+        await nuvemEnviar();
+    } catch (err) {
+        console.error("Erro ao conectar:", err);
+        nuvemCfg.mesa = "";
+        atualizarUiMesa();
+        nuvemStatus("Erro: " + nuvemErro(err));
+    }
+}
+
+async function nuvemDesconectar() {
+    if (nuvemUnsub) { nuvemUnsub(); nuvemUnsub = null; }
+    if (nuvemUnsubRanq) { nuvemUnsubRanq(); nuvemUnsubRanq = null; }
+    definirRanqueador({ liberado: false }, { modo: "vivo" });
+    salvarCacheRanq();
+    clearTimeout(nuvemTimer);
+    nuvemCfg.mesa = "";
+    await nuvemSalvarCfg();
+    document.getElementById("mesaCodigo").disabled = false;
+    atualizarUiMesa();
+    nuvemStatus("Desconectado. Sua ficha continua salva neste navegador.");
+}
+
+async function iniciarNuvem() {
+    try {
+        const salvo = await armazenamento.get(NUVEM_KEY);
+        if (salvo) {
+            const cfg = JSON.parse(salvo);
+            nuvemCfg = { mesa: String(cfg.mesa || ""), id: String(cfg.id || ""), mestreTs: Number(cfg.mestreTs) || 0 };
+        }
+    } catch (err) { /* nada salvo ainda */ }
+    atualizarUiMesa();
+    if (nuvemCfg.mesa) nuvemConectar(nuvemCfg.mesa);
+}
+
+document.getElementById("btnMesaConectar").addEventListener("click", () => nuvemConectar(document.getElementById("mesaCodigo").value));
+document.getElementById("mesaCodigo").addEventListener("keydown", e => { if (e.key === "Enter") nuvemConectar(e.target.value); });
+document.getElementById("btnMesaSair").addEventListener("click", nuvemDesconectar);
+
+/* ---------- Eventos ---------- */
+
+["fis","men","con","agi","pre","von"].forEach(id => {
+    document.getElementById(id).addEventListener("input", statInputHandler);
+});
+document.getElementById("nivel").addEventListener("input", updateAll);
+const campoNome = document.querySelector('[data-key="nome"]');
+if (campoNome) campoNome.addEventListener("input", atualizarTopo);
+document.getElementById("bounty").addEventListener("input", e => {
+    setTimeout(atualizarTopo, 0);
+    const f = formatarBounty(e.target.value);
+    if (f !== e.target.value) e.target.value = f;
+});
+
+document.getElementById("vidaAtual").addEventListener("input", updateBars);
+document.getElementById("energiaAtual").addEventListener("input", updateBars);
+
+document.querySelectorAll("[data-key]").forEach(el => {
+    el.addEventListener("input", agendarSalvamento);
+});
+
+document.getElementById("addPoder").addEventListener("click", () => {
+    criarPoderCard();
+    agendarSalvamento();
+});
+document.getElementById("addHabilidade").addEventListener("click", () => {
+    criarHabilidadeCard();
+    agendarSalvamento();
+});
+document.getElementById("addObjetivo").addEventListener("click", () => {
+    criarObjetivoCard();
+    agendarSalvamento();
+});
+
+document.querySelectorAll(".pericias-tabela input[type=radio]").forEach(r => {
+    r.addEventListener("click", function () {
+        const linha = this.closest(".linha");
+        const radiosDaLinha = linha.querySelectorAll('input[type="radio"]');
+
+        if (lastChecked[this.name] === this) {
+            this.checked = false;
+            lastChecked[this.name] = null;
+        } else {
+            lastChecked[this.name] = this;
+        }
+
+        radiosDaLinha.forEach(radio => {
+            if (radio.checked) lastChecked[radio.name] = radio;
+        });
+
+        updatePericias();
+        atualizarInfoPericia();
+        agendarSalvamento();
+    });
+});
+
+const fotoBox = document.getElementById("fotoBox");
+const fotoInput = document.getElementById("fotoInput");
+fotoBox.addEventListener("click", () => fotoInput.click());
+fotoBox.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fotoInput.click(); }
+});
+fotoInput.addEventListener("change", e => {
+    const arquivo = e.target.files[0];
+    e.target.value = "";
+    if (!arquivo) return;
+    if (!arquivo.type.startsWith("image/")) {
+        alert("Escolha um arquivo de imagem.");
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => abrirCrop(ev.target.result);
+    reader.readAsDataURL(arquivo);
+});
+document.getElementById("fotoRemover").addEventListener("click", () => {
+    fotoDados = "";
+    mostrarFoto();
+    agendarSalvamento();
+});
+
+const cropArea = document.getElementById("cropArea");
+cropArea.addEventListener("pointerdown", e => {
+    arrastando = { px: e.clientX, py: e.clientY, x: cropState.x, y: cropState.y };
+    cropArea.setPointerCapture(e.pointerId);
+});
+cropArea.addEventListener("pointermove", e => {
+    if (!arrastando) return;
+    cropState.x = arrastando.x + (e.clientX - arrastando.px);
+    cropState.y = arrastando.y + (e.clientY - arrastando.py);
+    aplicarCrop();
+});
+["pointerup", "pointercancel"].forEach(ev => cropArea.addEventListener(ev, () => { arrastando = null; }));
+
+document.getElementById("cropZoom").addEventListener("input", e => {
+    const novoZoom = parseFloat(e.target.value);
+    const sAntigo = cropState.base * cropState.zoom;
+    const cx = (CROP_SIZE / 2 - cropState.x) / sAntigo;
+    const cy = (CROP_SIZE / 2 - cropState.y) / sAntigo;
+    cropState.zoom = novoZoom;
+    const sNovo = cropState.base * novoZoom;
+    cropState.x = CROP_SIZE / 2 - cx * sNovo;
+    cropState.y = CROP_SIZE / 2 - cy * sNovo;
+    aplicarCrop();
+});
+document.getElementById("cropConfirmar").addEventListener("click", confirmarCrop);
+document.getElementById("cropCancelar").addEventListener("click", fecharCrop);
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !document.getElementById("cropModal").hidden) fecharCrop();
+});
+
+function limparFicha() {
+    const ok = confirm("Limpar a ficha inteira? Isso apaga todos os dados e a foto deste personagem.\n\nSe quiser guardar uma cópia, cancele e use \"Baixar ficha\" antes.");
+    if (!ok) return;
+
+    const campos = {};
+    document.querySelectorAll("[data-key]").forEach(el => {
+        campos[el.dataset.key] = el.defaultValue;
+    });
+
+    aplicarEstado({ campos, pericias: {}, poderes: [], habilidades: [], objetivos: [], foto: "" });
+
+    historico = [];
+    renderizarHistorico();
+
+    agendarSalvamento();
+}
+document.getElementById("limparFichaBtn").addEventListener("click", limparFicha);
+
+popularSelectPericias();
+document.getElementById("rolPericia").addEventListener("change", atualizarInfoPericia);
+document.getElementById("rolAtributoLivre").addEventListener("change", atualizarInfoPericia);
+document.getElementById("rolarPericiaBtn").addEventListener("click", rolarTestePericia);
+document.getElementById("rolarDadosBtn").addEventListener("click", rolarOutrosDados);
+
+carregarFicha();
+</script>
+
+</body>
+</html>
